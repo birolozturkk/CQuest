@@ -1,0 +1,4 @@
+name: CQuest
+version: '${project.version}'
+main: dev.crius.cquest.CQuest
+api-version: 1.16
