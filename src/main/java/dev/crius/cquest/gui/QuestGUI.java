@@ -50,7 +50,7 @@ public class QuestGUI extends PaginatedGUI<Quest> {
     @Override
     public Item getItem(Quest quest) {
         Item item;
-        List<Placeholder> placeholders = new PlaceholderBuilder().applyForQuest(quest).build();
+        List<Placeholder> placeholders = new PlaceholderBuilder().applyForQuest(quest, player).build();
 
         Optional<Quest> activeQuestOptional = CQuest.getInstance().getQuestManager().getQuest(player);
         List<Quest> completedQuests = CQuest.getInstance().getQuestManager().getCompletedQuests(player);
@@ -63,14 +63,6 @@ public class QuestGUI extends PaginatedGUI<Quest> {
         }
 
         return item;
-    }
-
-    public Map<Integer, Quest> getQuests() {
-        return questPage.getQuests();
-    }
-
-    private int getQuestRequirementIndex(QuestRequirement questRequirement) {
-        return questRequirement.getQuest().getQuestRequirements().indexOf(questRequirement);
     }
 
     @Override

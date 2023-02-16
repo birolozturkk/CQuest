@@ -63,6 +63,14 @@ public class Quest {
                 .toList();
     }
 
+    @SuppressWarnings("unchecked")
+    public List<ActionQuestRequirement> getActionRequirements() {
+        return questRequirements.stream()
+                .filter(requirement -> requirement instanceof ActionQuestRequirement<?>)
+                .map(requirement -> (ActionQuestRequirement) requirement)
+                .toList();
+    }
+
     private void finish(Player player) {
         player.sendMessage("Congrats Quest is finished");
         CQuest.getInstance().getQuestManager().assignQuest(player, getNext());
