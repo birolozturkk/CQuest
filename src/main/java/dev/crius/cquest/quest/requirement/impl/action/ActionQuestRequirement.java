@@ -1,8 +1,8 @@
-package dev.crius.cquest.model.requirement.impl.action;
+package dev.crius.cquest.quest.requirement.impl.action;
 
 import dev.crius.cquest.CQuest;
-import dev.crius.cquest.model.Quest;
-import dev.crius.cquest.model.requirement.QuestRequirement;
+import dev.crius.cquest.quest.Quest;
+import dev.crius.cquest.quest.requirement.QuestRequirement;
 import lombok.Getter;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -24,7 +24,7 @@ public abstract class ActionQuestRequirement<T extends Event> extends QuestRequi
 
     @Override
     public boolean control(Player player) {
-        return CQuest.getInstance().getQuestManager().getQuestData(player.getUniqueId(), quest.getId(),
+        return CQuest.getInstance().getQuestManager().getQuestData(player, quest.getId(),
                 quest.getQuestRequirements().indexOf(this)).getProgress() >= progress;
     }
 }

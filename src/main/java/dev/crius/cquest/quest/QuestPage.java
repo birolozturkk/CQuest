@@ -1,4 +1,4 @@
-package dev.crius.cquest.model;
+package dev.crius.cquest.quest;
 
 import dev.crius.cquest.config.inventory.QuestGUIConfig;
 import lombok.Getter;

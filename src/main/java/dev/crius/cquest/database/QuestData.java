@@ -1,4 +1,4 @@
-package dev.crius.cquest.model;
+package dev.crius.cquest.database;
 
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;

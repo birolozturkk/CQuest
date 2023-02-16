@@ -1,5 +1,8 @@
 package dev.crius.cquest.config;
 
+import com.cryptomorin.xseries.XMaterial;
+import dev.crius.cquest.gui.QuestGUI;
+
 import java.util.Arrays;
 import java.util.List;
 

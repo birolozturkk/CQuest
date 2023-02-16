@@ -2,8 +2,7 @@ package dev.crius.cquest.repository.impl;
 
 import com.j256.ormlite.support.ConnectionSource;
 import dev.crius.cquest.SortedList;
-import dev.crius.cquest.model.ActiveQuest;
-import dev.crius.cquest.model.QuestData;
+import dev.crius.cquest.database.ActiveQuest;
 import dev.crius.cquest.repository.Repository;
 
 import java.sql.SQLException;
@@ -19,6 +18,7 @@ public class ActiveQuestRepository extends Repository<ActiveQuest, Integer> {
     public ActiveQuestRepository(ConnectionSource connectionSource) throws SQLException {
         super(connectionSource, ActiveQuest.class, Comparator.comparing(ActiveQuest::getId));
         activeQuests.addAll(getEntries());
+        activeQuests.sort();
     }
 
     @Override
@@ -26,6 +26,7 @@ public class ActiveQuestRepository extends Repository<ActiveQuest, Integer> {
         super.addEntry(activeQuest);
         activeQuests.add(activeQuest);
     }
+
 
     public Optional<ActiveQuest> getActiveQuest(UUID playerUUID) {
         return activeQuests.getEntry(new ActiveQuest(playerUUID));

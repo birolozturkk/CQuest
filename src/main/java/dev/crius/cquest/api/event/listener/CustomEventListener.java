@@ -1,5 +1,6 @@
 package dev.crius.cquest.api.event.listener;
 
+import com.cryptomorin.xseries.XMaterial;
 import dev.crius.cquest.CQuest;
 import dev.crius.cquest.api.event.impl.customevents.impl.HarvestEvent;
 import dev.crius.cquest.api.event.impl.customevents.impl.PlantEvent;

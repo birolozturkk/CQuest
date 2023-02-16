@@ -1,7 +1,6 @@
-package dev.crius.cquest.model.requirement.impl.state;
+package dev.crius.cquest.quest.requirement.impl.state;
 
-import dev.crius.cquest.model.Quest;
-import dev.crius.cquest.model.requirement.QuestRequirement;
+import dev.crius.cquest.quest.Quest;
 import org.bukkit.entity.Player;
 
 public class ItemQuestRequirement extends StateQuestRequirement {

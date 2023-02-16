@@ -1,9 +1,8 @@
-package dev.crius.cquest.model.requirement;
+package dev.crius.cquest.quest.requirement;
 
-import dev.crius.cquest.model.Quest;
+import dev.crius.cquest.quest.Quest;
 import lombok.Getter;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
 
 @Getter
 public abstract class QuestRequirement {

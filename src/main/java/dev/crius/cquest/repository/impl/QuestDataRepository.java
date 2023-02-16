@@ -2,13 +2,11 @@ package dev.crius.cquest.repository.impl;
 
 import com.j256.ormlite.support.ConnectionSource;
 import dev.crius.cquest.SortedList;
-import dev.crius.cquest.model.Quest;
-import dev.crius.cquest.model.QuestData;
+import dev.crius.cquest.database.QuestData;
 import dev.crius.cquest.repository.Repository;
 
 import java.sql.SQLException;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
 
 public class QuestDataRepository extends Repository<QuestData, Integer> {
 
@@ -19,6 +17,7 @@ public class QuestDataRepository extends Repository<QuestData, Integer> {
     public QuestDataRepository(ConnectionSource connectionSource) throws SQLException {
         super(connectionSource, QuestData.class, Comparator.comparing(QuestData::getId));
         questDataEntries.addAll(getEntries());
+        System.out.println(getEntries());
     }
 
     @Override

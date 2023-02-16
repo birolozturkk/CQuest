@@ -1,16 +1,10 @@
 package dev.crius.cquest.placeholder;
 
 import dev.crius.cquest.CQuest;
-import dev.crius.cquest.model.ActiveQuest;
-import dev.crius.cquest.model.Quest;
-import dev.crius.cquest.model.QuestData;
-import dev.crius.cquest.model.requirement.QuestRequirement;
-import dev.crius.cquest.model.requirement.impl.action.ActionQuestRequirement;
+import dev.crius.cquest.quest.Quest;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 public class PlaceholderBuilder {
 

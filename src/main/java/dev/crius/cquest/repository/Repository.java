@@ -32,7 +32,7 @@ public class Repository<T extends DatabaseObject, S> {
     }
 
     public void sort() {
-        getEntries().sort(comparator);
+        entries.sort(comparator);
     }
 
     public CompletableFuture<Void> save(T value) {

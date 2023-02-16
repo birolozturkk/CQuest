@@ -2,14 +2,10 @@ package dev.crius.cquest.gui;
 
 import com.github.scropytr.legendinventoryapi.gui.PaginatedGUI;
 import com.github.scropytr.legendinventoryapi.item.Item;
-import com.github.scropytr.legendinventoryapi.item.ItemBuilder;
 import dev.crius.cquest.CQuest;
-import dev.crius.cquest.config.inventory.QuestGUIConfig;
-import dev.crius.cquest.model.ActiveQuest;
-import dev.crius.cquest.model.Quest;
-import dev.crius.cquest.model.QuestData;
-import dev.crius.cquest.model.QuestPage;
-import dev.crius.cquest.model.requirement.QuestRequirement;
+import dev.crius.cquest.quest.Quest;
+import dev.crius.cquest.quest.QuestPage;
+import dev.crius.cquest.quest.requirement.QuestRequirement;
 import dev.crius.cquest.placeholder.Placeholder;
 import dev.crius.cquest.placeholder.PlaceholderBuilder;
 import dev.crius.cquest.utils.ItemUtils;
@@ -18,7 +14,6 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -44,7 +39,7 @@ public class QuestGUI extends PaginatedGUI<Quest> {
     }
 
     public List<Integer> getSlots() {
-        return questPage.getGui().questItem.canCompleteQuest.slots;
+        return questPage.getGui().questItem.slots;
     }
 
     @Override
@@ -54,38 +49,24 @@ public class QuestGUI extends PaginatedGUI<Quest> {
 
     @Override
     public Item getItem(Quest quest) {
-
-        QuestGUIConfig questGUIConfig = CQuest.getInstance().getQuestGUIConfig();
-        ItemBuilder itemBuilder;
-
+        Item item;
         List<Placeholder> placeholders = new PlaceholderBuilder().applyForQuest(quest).build();
 
-        Optional<ActiveQuest> activeQuestOptional = CQuest.getInstance().getQuestManager().getActiveQuest(player);
+        Optional<Quest> activeQuestOptional = CQuest.getInstance().getQuestManager().getQuest(player);
         List<Quest> completedQuests = CQuest.getInstance().getQuestManager().getCompletedQuests(player);
-        if (activeQuestOptional.isPresent()) {
-            itemBuilder = ItemUtils.makeItem(questGUIConfig.questItem.canCompleteQuest);
+        if (activeQuestOptional.isPresent() && activeQuestOptional.get() == quest) {
+            item = ItemUtils.makeItem(questPage.getGui().questItem.canCompleteQuest, placeholders);
         } else if (completedQuests.contains(quest)) {
-            itemBuilder.setType(questGUIConfig.questItem.completedQuest.material);
+            item = ItemUtils.makeItem(questPage.getGui().questItem.completedQuest, placeholders);
         } else {
-            itemBuilder.setType(questGUIConfig.questItem.canNotCompleteQuest.material);
+            item = ItemUtils.makeItem(questPage.getGui().questItem.canNotCompleteQuest, placeholders);
         }
 
-        return new ItemBui;
+        return item;
     }
 
     public Map<Integer, Quest> getQuests() {
         return questPage.getQuests();
-    }
-
-    public Item getItem(Quest quest) {
-        List<QuestData> questData = quest.getQuestRequirements().stream()
-                .map(questRequirement -> CQuest.getInstance().getQuestManager().getQuestData(player.getUniqueId(),
-                        quest.getId(), getQuestRequirementIndex(questRequirement)))
-                .toList();
-        List<Placeholder> placeholders = new PlaceholderBuilder()
-                .applyForQuest(quest, questData)
-                .build();
-        return ItemUtils.makeItem(questPage.getGui().questItem.completedQuest, placeholders);
     }
 
     private int getQuestRequirementIndex(QuestRequirement questRequirement) {
@@ -94,7 +75,7 @@ public class QuestGUI extends PaginatedGUI<Quest> {
 
     @Override
     public void addContent() {
-
+        super.addContent();
     }
 
     @Override

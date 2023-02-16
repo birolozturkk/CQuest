@@ -1,5 +1,6 @@
 package dev.crius.cquest.api.event.impl.customevents.impl;
 
+import com.cryptomorin.xseries.XMaterial;
 import dev.crius.cquest.api.event.impl.customevents.AbstractPlayerEvent;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;

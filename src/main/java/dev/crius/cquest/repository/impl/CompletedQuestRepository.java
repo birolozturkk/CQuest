@@ -2,8 +2,7 @@ package dev.crius.cquest.repository.impl;
 
 import com.j256.ormlite.support.ConnectionSource;
 import dev.crius.cquest.SortedList;
-import dev.crius.cquest.model.ActiveQuest;
-import dev.crius.cquest.model.CompletedQuest;
+import dev.crius.cquest.database.CompletedQuest;
 import dev.crius.cquest.repository.Repository;
 
 import java.sql.SQLException;
@@ -20,9 +19,9 @@ public class CompletedQuestRepository extends Repository<CompletedQuest, Integer
     }
 
     @Override
-    public void addEntry(CompletedQuest activeQuest) {
-        super.addEntry(activeQuest);
-        completedQuests.add(activeQuest);
+    public void addEntry(CompletedQuest completedQuest) {
+        super.addEntry(completedQuest);
+        completedQuests.add(completedQuest);
     }
 
     public List<CompletedQuest> getCompletedQuests(UUID playerUUID) {

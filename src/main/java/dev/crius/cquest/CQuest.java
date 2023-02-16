@@ -8,12 +8,16 @@ import dev.crius.cquest.config.inventory.QuestGUIConfig;
 import dev.crius.cquest.listener.QuestListener;
 import dev.crius.cquest.managers.DatabaseManager;
 import dev.crius.cquest.managers.QuestManager;
+import dev.triumphteam.cmd.bukkit.BukkitCommandManager;
 import lombok.Getter;
 import lombok.SneakyThrows;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.IOException;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
 
 @Getter
 public final class CQuest extends JavaPlugin {
@@ -22,12 +26,11 @@ public final class CQuest extends JavaPlugin {
     private Persist persist;
 
     private Configuration configuration;
-    private QuestGUIConfig questGUIConfig;
     private SQL sql;
 
     private DatabaseManager databaseManager;
     private QuestManager questManager;
-
+    private BukkitCommandManager<CommandSender> commandManager = BukkitCommandManager.create(this);
     @Override
     public void onEnable() {
         instance = this;
@@ -38,22 +41,23 @@ public final class CQuest extends JavaPlugin {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
+
         loadConfigs();
         saveConfigs();
         setupManagers();
         questManager.load();
         registerListeners();
+        commandManager.registerCommand(new QuestCommand(this));
     }
 
     private void loadConfigs() {
         configuration = persist.load(Configuration.class, "config");
-        questGUIConfig = persist.load(QuestGUIConfig.class, "quest-gui");
         sql = persist.load(SQL.class, "sql");
     }
 
     private void saveConfigs() {
         persist.save(configuration, "config");
-        persist.save(questGUIConfig, "quest-gui");
         persist.save(sql, "sql");
     }
 

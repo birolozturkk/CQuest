@@ -1,16 +1,17 @@
 package dev.crius.cquest.managers;
 
+import com.cryptomorin.xseries.XMaterial;
 import dev.crius.cquest.CQuest;
-import dev.crius.cquest.model.ActiveQuest;
-import dev.crius.cquest.model.Quest;
-import dev.crius.cquest.model.QuestData;
-import dev.crius.cquest.model.QuestPage;
-import dev.crius.cquest.model.requirement.DefaultQuestRequirement;
-import dev.crius.cquest.model.requirement.QuestRequirement;
-import dev.crius.cquest.model.requirement.impl.action.HarvestQuestRequirement;
-import dev.crius.cquest.model.requirement.impl.action.PlantQuestRequirement;
-import dev.crius.cquest.model.requirement.impl.state.ItemQuestRequirement;
-import dev.crius.cquest.model.requirement.impl.state.MoneyQuestRequirement;
+import dev.crius.cquest.database.ActiveQuest;
+import dev.crius.cquest.database.CompletedQuest;
+import dev.crius.cquest.database.QuestData;
+import dev.crius.cquest.quest.*;
+import dev.crius.cquest.quest.requirement.DefaultQuestRequirement;
+import dev.crius.cquest.quest.requirement.QuestRequirement;
+import dev.crius.cquest.quest.requirement.impl.action.HarvestQuestRequirement;
+import dev.crius.cquest.quest.requirement.impl.action.PlantQuestRequirement;
+import dev.crius.cquest.quest.requirement.impl.state.ItemQuestRequirement;
+import dev.crius.cquest.quest.requirement.impl.state.MoneyQuestRequirement;
 import dev.crius.cquest.repository.impl.ActiveQuestRepository;
 import dev.crius.cquest.repository.impl.CompletedQuestRepository;
 import dev.crius.cquest.repository.impl.QuestDataRepository;
@@ -61,7 +62,6 @@ public class QuestManager {
                 .flatMap(Collection::stream)
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
-
         quests.values().forEach(quest -> {
             quest.getRequirements().stream()
                     .map(requirement -> requirement.split(" "))
@@ -86,9 +86,9 @@ public class QuestManager {
     }
 
     public void assignQuest(Player player, Quest quest) {
-        if (quest == null) return;
         Optional<ActiveQuest> activeQuestOptional = getActiveQuest(player);
         if (activeQuestOptional.isEmpty()) {
+            System.out.println("debug");
             ActiveQuest activeQuest = new ActiveQuest(player.getUniqueId(), quest.getId());
             activeQuestRepository.addEntry(activeQuest);
             activeQuestRepository.save(activeQuest);
@@ -100,36 +100,56 @@ public class QuestManager {
         activeQuestRepository.save(activeQuest);
     }
 
-    public Quest getQuest(Player player) {
+    public void completeQuest(Player player, Quest quest) {
+        CompletedQuest completedQuest = new CompletedQuest(player.getUniqueId(), quest.getId());
+        completedQuestRepository.addEntry(completedQuest);
+        completedQuestRepository.save(completedQuest);
+    }
+
+    public Optional<Quest> getQuest(Player player) {
         Optional<ActiveQuest> activeQuest = getActiveQuest(player);
         if (activeQuest.isEmpty()) {
+            System.out.println("debug");
             Quest defaultQuest = quests.get(1);
             assignQuest(player, defaultQuest);
-            return defaultQuest;
+            return Optional.of(defaultQuest);
         }
-        return quests.get(activeQuest.get().getQuestId());
+        return getQuest(activeQuest.get().getQuestId());
     }
 
 
-    public QuestData getQuestData(UUID playerUUID, int questId, int requirementIndex) {
-        Optional<QuestData> optionalQuestData = questDataRepository.getQuestData(playerUUID, questId, requirementIndex);
+    public QuestData getQuestData(Player player, int questId, int requirementIndex) {
+        Optional<QuestData> optionalQuestData = questDataRepository.getQuestData(player.getUniqueId(), questId, requirementIndex);
         if (optionalQuestData.isPresent()) return optionalQuestData.get();
-        QuestData questData = new QuestData(playerUUID, questId, requirementIndex);
+        QuestData questData = new QuestData(player.getUniqueId(), questId, requirementIndex);
         questDataRepository.addEntry(questData);
         return questData;
     }
 
-    public Quest getQuest(int id) {
-        return quests.get(id);
+    public Optional<Quest> getQuest(int id) {
+        return Optional.ofNullable(quests.get(id));
     }
 
     public List<Quest> getCompletedQuests(Player player) {
         return completedQuestRepository.getCompletedQuests(player.getUniqueId()).stream()
                 .map(completedQuest -> getQuest(completedQuest.getId()))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
                 .toList();
     }
 
     public Optional<ActiveQuest> getActiveQuest(Player player) {
         return activeQuestRepository.getActiveQuest(player.getUniqueId());
+    }
+
+    public Optional<QuestPage> getQuestPage(Player player) {
+        Optional<ActiveQuest> activeQuest = getActiveQuest(player);
+        Optional<Quest> quest = getQuest(player);
+        if(quest.isEmpty() && activeQuest.isPresent())
+            quest = getQuest(activeQuest.get().getQuestId() - 1);
+        Quest finalQuest = quest.get();
+        return questPages.stream()
+                .filter(questPage -> questPage.getQuests().containsValue(finalQuest))
+                .findFirst();
     }
 }

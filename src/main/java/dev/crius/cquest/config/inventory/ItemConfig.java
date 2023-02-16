@@ -17,5 +17,4 @@ public class ItemConfig {
     public String headOwner;
     public UUID headOwnerUUID;
     public List<String> lore;
-    public List<Integer> slots;
 }

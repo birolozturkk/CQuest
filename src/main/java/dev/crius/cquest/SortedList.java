@@ -1,6 +1,5 @@
 package dev.crius.cquest;
 
-import dev.crius.cquest.model.QuestData;
 import lombok.Getter;
 
 import java.util.*;
@@ -9,9 +8,8 @@ import java.util.*;
 public class SortedList<T> extends ArrayList<T> {
     private final Comparator<T> comparator;
 
-    public SortedList(final Comparator<T> comparator) {
+    public SortedList(Comparator<T> comparator) {
         this.comparator = comparator;
-        sort(comparator);
     }
 
     @Override
@@ -26,5 +24,9 @@ public class SortedList<T> extends ArrayList<T> {
         int index = Collections.binarySearch(this, entry, comparator);
         if (index < 0) return Optional.empty();
         return Optional.of(get(index));
+    }
+
+    public void sort() {
+        sort(comparator);
     }
 }
