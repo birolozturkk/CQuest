@@ -3,23 +3,30 @@ package dev.crius.cquest.api.event.listener;
 import com.cryptomorin.xseries.XMaterial;
 import dev.crius.cquest.CQuest;
 import dev.crius.cquest.api.event.impl.customevents.impl.HarvestEvent;
+import dev.crius.cquest.api.event.impl.customevents.impl.MobKillEvent;
 import dev.crius.cquest.api.event.impl.customevents.impl.PlantEvent;
+import dev.crius.cquest.api.event.impl.customevents.impl.PlayerKillEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.Ageable;
+import org.bukkit.entity.Animals;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 
 import java.util.Objects;
 
 public class CustomEventListener implements Listener {
 
     @EventHandler
-    public void harvest(BlockBreakEvent event){
+    public void harvest(BlockBreakEvent event) {
         Player player = event.getPlayer();
         Block block = event.getBlock();
 
@@ -28,15 +35,15 @@ public class CustomEventListener implements Listener {
         if (!isAllowedPlant(material))
             return;
 
-        if(!(block.getBlockData() instanceof Ageable ageable)) return;
+        if (!(block.getBlockData() instanceof Ageable ageable)) return;
 
-        if(ageable.getAge() != ageable.getMaximumAge()) return;
+        if (ageable.getAge() != ageable.getMaximumAge()) return;
 
         Bukkit.getPluginManager().callEvent(new HarvestEvent(player, XMaterial.matchXMaterial(material)));
     }
 
     @EventHandler
-    public void plant(BlockPlaceEvent event){
+    public void plant(BlockPlaceEvent event) {
         Player player = event.getPlayer();
         Block block = event.getBlockPlaced();
 
@@ -48,7 +55,30 @@ public class CustomEventListener implements Listener {
         Bukkit.getPluginManager().callEvent(new PlantEvent(player, XMaterial.matchXMaterial(material)));
     }
 
-    private boolean isAllowedPlant(Material material){
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void kill(EntityDamageByEntityEvent event) {
+        if (!(event.getDamager() instanceof Player damager)) return;
+
+        if (event.getEntity() instanceof Player) {
+            Bukkit.getPluginManager().callEvent(new PlayerKillEvent(damager, (Player) event.getEntity(), event.getCause()));
+            return;
+        }
+        if (!(event.getEntity() instanceof Mob victim)) return;
+        if (!isAllowedMob(victim)) return;
+        if (victim.getHealth() > event.getFinalDamage()) return;
+
+        Bukkit.getPluginManager().callEvent(new MobKillEvent(damager, victim, event.getCause()));
+    }
+
+    private boolean isAllowedMob(Mob mob) {
+        return CQuest.getInstance().getConfiguration()
+                .allowedMobs
+                .stream()
+                .toList()
+                .contains(mob.getType());
+    }
+
+    private boolean isAllowedPlant(Material material) {
         return CQuest.getInstance().getConfiguration()
                 .allowedPlants
                 .stream()
