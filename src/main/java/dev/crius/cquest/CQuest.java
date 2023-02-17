@@ -2,9 +2,10 @@ package dev.crius.cquest;
 
 import com.github.scropytr.serializationapi.Persist;
 import dev.crius.cquest.api.event.listener.CustomEventListener;
+import dev.crius.cquest.commands.CQuestCommand;
+import dev.crius.cquest.commands.QuestCommand;
 import dev.crius.cquest.config.Configuration;
 import dev.crius.cquest.config.SQL;
-import dev.crius.cquest.config.inventory.QuestGUIConfig;
 import dev.crius.cquest.listener.QuestListener;
 import dev.crius.cquest.managers.BossBarManager;
 import dev.crius.cquest.managers.DatabaseManager;
@@ -15,12 +16,10 @@ import lombok.NonNull;
 import lombok.SneakyThrows;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.IOException;
 import java.util.logging.Level;
-import java.util.stream.Collectors;
 
 @Getter
 public final class CQuest extends JavaPlugin {
@@ -57,6 +56,7 @@ public final class CQuest extends JavaPlugin {
         questManager.load();
         registerListeners();
         commandManager.registerCommand(new QuestCommand(this));
+        commandManager.registerCommand(new CQuestCommand(this));
     }
 
     public void loadConfigs() {

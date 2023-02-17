@@ -4,16 +4,11 @@ import dev.crius.cquest.CQuest;
 import dev.crius.cquest.placeholder.PlaceholderBuilder;
 import dev.crius.cquest.quest.Quest;
 import dev.crius.cquest.utils.StringUtils;
-import net.kyori.adventure.Adventure;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
-import org.bukkit.Color;
-import org.bukkit.entity.Boss;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
 
-import javax.swing.plaf.PanelUI;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -29,45 +24,57 @@ public class BossBarManager {
     }
 
     public void update(Player player) {
-        BossBar bossBar = getBossBar(player);
+        Optional<BossBar> bossBar = getBossBar(player);
         Optional<Quest> quest = plugin.getQuestManager().getQuest(player);
-        String content = StringUtils.format(quest.get().getDescription(),
-                new PlaceholderBuilder().applyForQuest(quest.get(), player).build());
-        float progress = (float) quest.get().getProgress(player) / quest.get().getRequirementProgress(player);
-        bossBar.progress(progress);
-        bossBar.name(Component.text(content));
+        if(bossBar.isEmpty()) return;
+        bossBar.get().color(plugin.getConfiguration().bossBar.color);
+        bossBar.get().overlay(plugin.getConfiguration().bossBar.segment);
+        bossBar.get().progress(getProgress(player, quest.get()));
+        bossBar.get().name(Component.text(getContent(player, quest.get())));
     }
 
 
-    public void add(Player player) {
+    public void create(Player player) {
         hide(player);
         Optional<Quest> quest = plugin.getQuestManager().getQuest(player);
         if(quest.isEmpty()) return;
-        String content = StringUtils.format(quest.get().getDescription(),
-                new PlaceholderBuilder().applyForQuest(quest.get(), player).build());
-        BossBar bossBar = BossBar.bossBar(Component.text(content), 0, BossBar.Color.RED, BossBar.Overlay.NOTCHED_6);
+
+        BossBar bossBar = BossBar.bossBar(Component.text(getContent(player, quest.get())),
+                getProgress(player, quest.get()), plugin.getConfiguration().bossBar.color, plugin.getConfiguration().bossBar.segment);
         bossBars.put(player.getUniqueId(), bossBar);
-        show(player);
     }
 
     public void show(Player player) {
-        BossBar bossBar = getBossBar(player);
-        plugin.adventure().player(player).showBossBar(bossBar);
+        Optional<BossBar> bossBar = getBossBar(player);
+        if(bossBar.isEmpty()) return;
+        bossBars.put(player.getUniqueId(), bossBar.get());
+        Audience receiver = plugin.adventure().player(player);
+        receiver.showBossBar(bossBar.get());
     }
 
     public void hide(Player player) {
         BossBar bossBar = bossBars.get(player.getUniqueId());
         if(bossBar == null) return;
         bossBars.remove(player.getUniqueId());
-        plugin.adventure().player(player).hideBossBar(bossBar);
+        Audience receiver = plugin.adventure().player(player);
+        receiver.hideBossBar(bossBar);
     }
-    private BossBar getBossBar(Player player) {
+
+    private float getProgress(Player player, Quest quest) {
+        return (float) quest.getProgress(player) / quest.getRequirementProgress(player);
+    }
+    private String getContent(Player player, Quest quest) {
+        return StringUtils.format(plugin.getConfiguration().bossBar.content,
+                new PlaceholderBuilder().applyForQuest(quest, player).build());
+    }
+
+    private Optional<BossBar> getBossBar(Player player) {
         BossBar bossBar = bossBars.get(player.getUniqueId());
         if(bossBar == null) {
-            add(player);
-            return bossBars.get(player.getUniqueId());
+            create(player);
+            return Optional.ofNullable(bossBars.get(player.getUniqueId()));
         }
-        return bossBar;
+        return Optional.of(bossBar);
 
     }
 }

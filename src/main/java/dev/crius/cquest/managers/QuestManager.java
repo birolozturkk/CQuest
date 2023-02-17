@@ -8,15 +8,17 @@ import dev.crius.cquest.database.QuestData;
 import dev.crius.cquest.quest.*;
 import dev.crius.cquest.quest.requirement.DefaultQuestRequirement;
 import dev.crius.cquest.quest.requirement.QuestRequirement;
-import dev.crius.cquest.quest.requirement.impl.action.HarvestQuestRequirement;
-import dev.crius.cquest.quest.requirement.impl.action.PlantQuestRequirement;
+import dev.crius.cquest.quest.requirement.impl.action.*;
 import dev.crius.cquest.quest.requirement.impl.state.ItemQuestRequirement;
 import dev.crius.cquest.quest.requirement.impl.state.MoneyQuestRequirement;
 import dev.crius.cquest.repository.impl.ActiveQuestRepository;
 import dev.crius.cquest.repository.impl.CompletedQuestRepository;
 import dev.crius.cquest.repository.impl.QuestDataRepository;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDamageEvent;
 
 import java.io.File;
 import java.util.*;
@@ -71,6 +73,11 @@ public class QuestManager {
                         switch (args[0]) {
                             case "ITEM" -> questRequirement = new ItemQuestRequirement(quest);
                             case "MONEY" -> questRequirement = new MoneyQuestRequirement(quest);
+                            case "CRAFT_ITEM" -> questRequirement = new CraftItemQuestRequirement(quest,
+                                    XMaterial.matchXMaterial(args[1]).orElse(XMaterial.AIR).parseItem(), Integer.parseInt(args[2]));
+                            case "KILL_PLAYER" -> questRequirement = new PlayerKillQuestRequirement(quest, Integer.parseInt(args[1]));
+                            case "KILL_MOB" -> questRequirement = new MobKillQuestRequirement(quest,
+                                    EntityType.valueOf(args[1]), Integer.parseInt(args[2]));
                             case "HARVEST" -> questRequirement = new HarvestQuestRequirement(quest,
                                     XMaterial.matchXMaterial(args[1]).orElse(XMaterial.AIR), Integer.parseInt(args[2]));
                             case "PLANT" -> questRequirement = new PlantQuestRequirement(quest,
@@ -88,18 +95,20 @@ public class QuestManager {
 
     public void assignQuest(Player player, Quest quest) {
         Optional<ActiveQuest> activeQuestOptional = getActiveQuest(player);
+        if (getQuest(quest.getId()).isEmpty()) plugin.getBossBarManager().hide(player);
         if (activeQuestOptional.isEmpty()) {
             ActiveQuest activeQuest = new ActiveQuest(player.getUniqueId(), quest.getId());
             activeQuestRepository.addEntry(activeQuest);
             activeQuestRepository.save(activeQuest);
-            plugin.getBossBarManager().add(player);
+            plugin.getBossBarManager().update(player);
             return;
         }
         ActiveQuest activeQuest = activeQuestOptional.get();
         activeQuest.setQuestId(quest.getId());
         activeQuest.setChanged(true);
         activeQuestRepository.save(activeQuest);
-        Bukkit.getScheduler().runTaskLater(plugin, () -> plugin.getBossBarManager().add(player), 20);
+        plugin.getBossBarManager().update(player);
+        Bukkit.getScheduler().runTaskLater(plugin, () -> plugin.getBossBarManager().show(player), 20);
     }
 
     public void completeQuest(Player player, Quest quest) {
@@ -146,7 +155,7 @@ public class QuestManager {
     public Optional<QuestPage> getQuestPage(Player player) {
         Optional<ActiveQuest> activeQuest = getActiveQuest(player);
         Optional<Quest> quest = getQuest(player);
-        if(quest.isEmpty() && activeQuest.isPresent())
+        if (quest.isEmpty() && activeQuest.isPresent())
             quest = getQuest(activeQuest.get().getQuestId() - 1);
         Quest finalQuest = quest.get();
         return questPages.stream()

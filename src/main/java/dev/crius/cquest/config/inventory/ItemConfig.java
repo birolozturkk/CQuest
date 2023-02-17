@@ -1,12 +1,14 @@
 package dev.crius.cquest.config.inventory;
 
 import com.cryptomorin.xseries.XMaterial;
+import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
 import java.util.UUID;
 
 @NoArgsConstructor
+@AllArgsConstructor
 public class ItemConfig {
 
     public XMaterial material;

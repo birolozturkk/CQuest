@@ -2,6 +2,7 @@ package dev.crius.cquest.gui;
 
 import com.github.scropytr.legendinventoryapi.gui.PaginatedGUI;
 import com.github.scropytr.legendinventoryapi.item.Item;
+import com.github.scropytr.legendinventoryapi.item.ItemBuilder;
 import dev.crius.cquest.CQuest;
 import dev.crius.cquest.quest.Quest;
 import dev.crius.cquest.quest.QuestPage;
@@ -9,6 +10,7 @@ import dev.crius.cquest.quest.requirement.QuestRequirement;
 import dev.crius.cquest.placeholder.Placeholder;
 import dev.crius.cquest.placeholder.PlaceholderBuilder;
 import dev.crius.cquest.utils.ItemUtils;
+import dev.crius.cquest.utils.StringUtils;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
@@ -30,7 +32,7 @@ public class QuestGUI extends PaginatedGUI<Quest> {
 
     @Override
     public String getTitle() {
-        return questPage.getGui().title;
+        return StringUtils.colorize(questPage.getGui().title);
     }
 
     @Override
@@ -68,6 +70,9 @@ public class QuestGUI extends PaginatedGUI<Quest> {
     @Override
     public void addContent() {
         super.addContent();
+        questPage.getGui().items.values()
+                .forEach(itemConfig -> setItem(ItemUtils.makeItem(itemConfig, new PlaceholderBuilder().build()),
+                        itemConfig.slots));
     }
 
     @Override
@@ -82,7 +87,7 @@ public class QuestGUI extends PaginatedGUI<Quest> {
 
     @Override
     public void onClick(InventoryClickEvent event) {
-
+        event.setCancelled(true);
     }
 
 

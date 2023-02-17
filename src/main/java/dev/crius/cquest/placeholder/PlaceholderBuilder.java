@@ -15,11 +15,13 @@ public class PlaceholderBuilder {
     private final List<Placeholder> placeholders = new ArrayList<>();
 
     public PlaceholderBuilder() {
-        placeholders.add(new Placeholder("%prefix%", String.valueOf(CQuest.getInstance().getConfiguration().prefix)));
+        placeholders.add(new Placeholder("%prefix%", String.valueOf(CQuest.getInstance().getConfiguration().messages.prefix)));
     }
 
     public PlaceholderBuilder applyForQuest(Quest quest, Player player) {
         placeholders.add(new Placeholder("%quest_description%", quest.getDescription()));
+        placeholders.add(new Placeholder("%quest_id%", String.valueOf(quest.getId())));
+        placeholders.add(new Placeholder("%quest_name%", String.valueOf(quest.getName())));
 
         int progress = quest.getProgress(player);
         int requirementProgress = quest.getRequirementProgress(player);

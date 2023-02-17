@@ -25,6 +25,7 @@ import java.util.Optional;
 public class Quest {
 
     private int id;
+    private String name;
     private String description;
     private List<String> requirements = new ArrayList<>();
 
@@ -36,8 +37,8 @@ public class Quest {
         this.id = id;
     }
 
-    public Quest(int id, String description) {
-        this.id = id;
+    public Quest(String name, String description) {
+        this.name = name;
         this.description = description;
     }
 
@@ -46,11 +47,9 @@ public class Quest {
         CQuest.getInstance().getQuestManager().assignQuest(player, getNext());
         CQuest.getInstance().getQuestManager().completeQuest(player, this);
         Audience receiver = CQuest.getInstance().adventure().player(player);
-        String title = StringUtils.colorize(CQuest.getInstance().getConfiguration().completedTitle);
-        String subtitle = StringUtils.colorize(CQuest.getInstance().getConfiguration().completedSubtitle);
+        String title = StringUtils.colorize(CQuest.getInstance().getConfiguration().messages.completedTitle);
+        String subtitle = StringUtils.colorize(CQuest.getInstance().getConfiguration().messages.completedSubtitle);
         receiver.showTitle(Title.title(Component.text(title), Component.text(subtitle)));
-        receiver.playSound(Sound.sound(Key.key("soul_sand_valley.mood"), Sound.Source.AMBIENT, 10f, 1f), Sound.Emitter.self());
-
     }
 
     private boolean control(Player player) {

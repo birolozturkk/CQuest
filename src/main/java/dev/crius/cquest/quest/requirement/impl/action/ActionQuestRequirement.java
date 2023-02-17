@@ -1,9 +1,12 @@
 package dev.crius.cquest.quest.requirement.impl.action;
 
 import dev.crius.cquest.CQuest;
+import dev.crius.cquest.api.event.impl.customevents.impl.PlayerKillEvent;
 import dev.crius.cquest.quest.Quest;
 import dev.crius.cquest.quest.requirement.QuestRequirement;
+import lombok.Data;
 import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 
@@ -20,7 +23,9 @@ public abstract class ActionQuestRequirement<T extends Event> extends QuestRequi
         this.progress = progress;
     }
 
-    public abstract boolean isUpdatable(T event);
+    public boolean isUpdatable(T event) {
+        return true;
+    }
 
     @Override
     public boolean control(Player player) {

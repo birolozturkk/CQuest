@@ -1,5 +1,6 @@
-package dev.crius.cquest;
+package dev.crius.cquest.commands;
 
+import dev.crius.cquest.CQuest;
 import dev.crius.cquest.gui.QuestGUI;
 import dev.crius.cquest.quest.QuestPage;
 import dev.triumphteam.cmd.core.BaseCommand;
