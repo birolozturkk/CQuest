@@ -8,6 +8,13 @@ import java.util.List;
 
 public class Configuration {
 
-    public String prefix;
     public List<XMaterial> allowedPlants = Arrays.asList(XMaterial.OAK_SAPLING, XMaterial.POTATOES, XMaterial.WHEAT);
+
+    public static class Messages {
+
+        public String prefix = "&3CQuest &8>>";
+        public String completedTitle = "&aTebrikler";
+        public String completedSubtitle = "&fGörevi Başarıyla Tamamladın";
+    }
+
 }

@@ -48,7 +48,7 @@
                 <artifactId>maven-jar-plugin</artifactId>
                 <version>3.3.0</version>
                 <configuration>
-                    <outputDirectory>C:\Users\PC\Desktop\TestServer\plugins</outputDirectory>
+                    <outputDirectory>C:\Users\kisme\Desktop\spigot\plugins</outputDirectory>
                 </configuration>
             </plugin>
         </plugins>
@@ -80,6 +80,11 @@
     </repositories>
 
     <dependencies>
+        <dependency>
+            <groupId>net.kyori</groupId>
+            <artifactId>adventure-platform-bukkit</artifactId>
+            <version>4.2.0</version>
+        </dependency>
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>

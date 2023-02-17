@@ -37,6 +37,7 @@ public class QuestListener implements Listener {
         Optional<Quest> quest = plugin.getQuestManager().getQuest(player);
         if(quest.isEmpty()) return;
 
+        plugin.getBossBarManager().show(player);
         quest.get().accept(event, player);
     }
 

@@ -16,6 +16,7 @@ public class CompletedQuestRepository extends Repository<CompletedQuest, Integer
     public CompletedQuestRepository(ConnectionSource connectionSource) throws SQLException {
         super(connectionSource, CompletedQuest.class, Comparator.comparing(CompletedQuest::getId));
         completedQuests.addAll(getEntries());
+        completedQuests.sort();
     }
 
     @Override

@@ -15,6 +15,7 @@ import dev.crius.cquest.quest.requirement.impl.state.MoneyQuestRequirement;
 import dev.crius.cquest.repository.impl.ActiveQuestRepository;
 import dev.crius.cquest.repository.impl.CompletedQuestRepository;
 import dev.crius.cquest.repository.impl.QuestDataRepository;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.io.File;
@@ -88,16 +89,17 @@ public class QuestManager {
     public void assignQuest(Player player, Quest quest) {
         Optional<ActiveQuest> activeQuestOptional = getActiveQuest(player);
         if (activeQuestOptional.isEmpty()) {
-            System.out.println("debug");
             ActiveQuest activeQuest = new ActiveQuest(player.getUniqueId(), quest.getId());
             activeQuestRepository.addEntry(activeQuest);
             activeQuestRepository.save(activeQuest);
+            plugin.getBossBarManager().add(player);
             return;
         }
         ActiveQuest activeQuest = activeQuestOptional.get();
         activeQuest.setQuestId(quest.getId());
         activeQuest.setChanged(true);
         activeQuestRepository.save(activeQuest);
+        Bukkit.getScheduler().runTaskLater(plugin, () -> plugin.getBossBarManager().add(player), 20);
     }
 
     public void completeQuest(Player player, Quest quest) {
@@ -109,7 +111,6 @@ public class QuestManager {
     public Optional<Quest> getQuest(Player player) {
         Optional<ActiveQuest> activeQuest = getActiveQuest(player);
         if (activeQuest.isEmpty()) {
-            System.out.println("debug");
             Quest defaultQuest = quests.get(1);
             assignQuest(player, defaultQuest);
             return Optional.of(defaultQuest);

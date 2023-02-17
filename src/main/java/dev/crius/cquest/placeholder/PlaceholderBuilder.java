@@ -21,17 +21,11 @@ public class PlaceholderBuilder {
     public PlaceholderBuilder applyForQuest(Quest quest, Player player) {
         placeholders.add(new Placeholder("%quest_description%", quest.getDescription()));
 
-        int progress = quest.getQuestRequirements().stream()
-                .map(this::getRequirementIndex)
-                .map(requirementIndex ->
-                        CQuest.getInstance().getQuestManager().getQuestData(player, quest.getId(), requirementIndex))
-                .map(QuestData::getProgress)
-                .reduce(0, Integer::sum);
-        int requirementProgress = quest.getActionRequirements().stream()
-                .map(ActionQuestRequirement::getProgress)
-                .reduce(0, Integer::sum);
+        int progress = quest.getProgress(player);
+        int requirementProgress = quest.getRequirementProgress(player);
         placeholders.add(new Placeholder("%progress%", String.valueOf(progress)));
         placeholders.add(new Placeholder("%requirement_progress%", String.valueOf(requirementProgress)));
+        placeholders.add(new Placeholder("%left_progress%", String.valueOf(requirementProgress - progress)));
         return this;
     }
 
@@ -44,7 +38,4 @@ public class PlaceholderBuilder {
         return placeholders;
     }
 
-    private int getRequirementIndex(QuestRequirement questRequirement) {
-        return questRequirement.getQuest().getQuestRequirements().indexOf(questRequirement);
-    }
 }

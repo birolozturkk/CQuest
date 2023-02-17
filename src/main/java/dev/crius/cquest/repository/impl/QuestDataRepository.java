@@ -17,7 +17,7 @@ public class QuestDataRepository extends Repository<QuestData, Integer> {
     public QuestDataRepository(ConnectionSource connectionSource) throws SQLException {
         super(connectionSource, QuestData.class, Comparator.comparing(QuestData::getId));
         questDataEntries.addAll(getEntries());
-        System.out.println(getEntries());
+        questDataEntries.sort();
     }
 
     @Override

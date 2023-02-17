@@ -5,8 +5,14 @@ import dev.crius.cquest.CQuest;
 import dev.crius.cquest.database.QuestData;
 import dev.crius.cquest.quest.requirement.QuestRequirement;
 import dev.crius.cquest.quest.requirement.impl.action.ActionQuestRequirement;
+import dev.crius.cquest.utils.StringUtils;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.key.Key;
+import net.kyori.adventure.sound.Sound;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.title.Title;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 
@@ -35,10 +41,21 @@ public class Quest {
         this.description = description;
     }
 
+    private void finish(Player player) {
+        player.sendMessage("Congrats Quest is finished");
+        CQuest.getInstance().getQuestManager().assignQuest(player, getNext());
+        CQuest.getInstance().getQuestManager().completeQuest(player, this);
+        Audience receiver = CQuest.getInstance().adventure().player(player);
+        String title = StringUtils.colorize(CQuest.getInstance().getConfiguration().completedTitle);
+        String subtitle = StringUtils.colorize(CQuest.getInstance().getConfiguration().completedSubtitle);
+        receiver.showTitle(Title.title(Component.text(title), Component.text(subtitle)));
+        receiver.playSound(Sound.sound(Key.key("soul_sand_valley.mood"), Sound.Source.AMBIENT, 10f, 1f), Sound.Emitter.self());
+
+    }
+
     private boolean control(Player player) {
         return questRequirements.stream().allMatch(questRequirement -> questRequirement.control(player));
     }
-
 
     private <T extends Event> void increment(T event, Player player) {
         getActionRequirements(event).stream()
@@ -64,22 +81,38 @@ public class Quest {
     }
 
     @SuppressWarnings("unchecked")
-    public List<ActionQuestRequirement> getActionRequirements() {
+    private List<ActionQuestRequirement> getActionRequirements() {
         return questRequirements.stream()
                 .filter(requirement -> requirement instanceof ActionQuestRequirement<?>)
                 .map(requirement -> (ActionQuestRequirement) requirement)
                 .toList();
     }
 
-    private void finish(Player player) {
-        player.sendMessage("Congrats Quest is finished");
-        CQuest.getInstance().getQuestManager().assignQuest(player, getNext());
-        CQuest.getInstance().getQuestManager().completeQuest(player, this);
+
+    private int getRequirementIndex(QuestRequirement questRequirement) {
+        return questRequirement.getQuest().getQuestRequirements().indexOf(questRequirement);
+    }
+
+    public int getProgress(Player player) {
+        return  questRequirements.stream()
+                .map(this::getRequirementIndex)
+                .map(requirementIndex ->
+                        CQuest.getInstance().getQuestManager().getQuestData(player, id, requirementIndex))
+                .map(QuestData::getProgress)
+                .reduce(0, Integer::sum);
+    }
+
+
+    public int getRequirementProgress(Player player) {
+        return getActionRequirements().stream()
+                .map(ActionQuestRequirement::getProgress)
+                .reduce(0, Integer::sum);
     }
 
     public void accept(Event event, Player player) {
         if(getActionRequirements(event).isEmpty()) return;
         increment(event, player);
+        CQuest.getInstance().getBossBarManager().update(player);
         accept(player);
     }
 

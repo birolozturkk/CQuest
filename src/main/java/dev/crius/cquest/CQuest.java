@@ -6,11 +6,14 @@ import dev.crius.cquest.config.Configuration;
 import dev.crius.cquest.config.SQL;
 import dev.crius.cquest.config.inventory.QuestGUIConfig;
 import dev.crius.cquest.listener.QuestListener;
+import dev.crius.cquest.managers.BossBarManager;
 import dev.crius.cquest.managers.DatabaseManager;
 import dev.crius.cquest.managers.QuestManager;
 import dev.triumphteam.cmd.bukkit.BukkitCommandManager;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.SneakyThrows;
+import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -30,7 +33,11 @@ public final class CQuest extends JavaPlugin {
 
     private DatabaseManager databaseManager;
     private QuestManager questManager;
+    private BossBarManager bossBarManager;
     private BukkitCommandManager<CommandSender> commandManager = BukkitCommandManager.create(this);
+
+    private BukkitAudiences adventure;
+
     @Override
     public void onEnable() {
         instance = this;
@@ -42,6 +49,7 @@ public final class CQuest extends JavaPlugin {
             throw new RuntimeException(e);
         }
 
+        this.adventure = BukkitAudiences.create(this);
 
         loadConfigs();
         saveConfigs();
@@ -51,7 +59,7 @@ public final class CQuest extends JavaPlugin {
         commandManager.registerCommand(new QuestCommand(this));
     }
 
-    private void loadConfigs() {
+    public void loadConfigs() {
         configuration = persist.load(Configuration.class, "config");
         sql = persist.load(SQL.class, "sql");
     }
@@ -66,6 +74,7 @@ public final class CQuest extends JavaPlugin {
         databaseManager = new DatabaseManager();
         databaseManager.init();
         questManager = new QuestManager(this);
+        bossBarManager = new BossBarManager(this);
     }
 
     private void registerListeners() {
@@ -77,7 +86,18 @@ public final class CQuest extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        // Plugin shutdown logic
+        if(this.adventure != null) {
+            this.adventure.close();
+            this.adventure = null;
+        }
+
+    }
+
+    public @NonNull BukkitAudiences adventure() {
+        if(this.adventure == null) {
+            throw new IllegalStateException("Tried to access Adventure when the plugin was disabled!");
+        }
+        return this.adventure;
     }
 
     public void log(String message) {
