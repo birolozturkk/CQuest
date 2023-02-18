@@ -4,15 +4,16 @@ import com.cryptomorin.xseries.XMaterial;
 import dev.crius.cquest.api.event.impl.customevents.AbstractPlayerEvent;
 import lombok.Getter;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 @Getter
-public class HarvestEvent extends AbstractPlayerEvent {
+public class CraftItemEvent extends AbstractPlayerEvent {
 
-    private final XMaterial crop;
+    private final ItemStack result;
 
-    public HarvestEvent(Player who, @NotNull XMaterial crop) {
+    public CraftItemEvent(Player who, ItemStack result) {
         super(who);
-        this.crop = crop;
+        this.result = result;
     }
 }

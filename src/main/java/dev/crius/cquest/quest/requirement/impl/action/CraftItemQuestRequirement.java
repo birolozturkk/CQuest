@@ -1,10 +1,10 @@
 package dev.crius.cquest.quest.requirement.impl.action;
 
 import dev.crius.cquest.CQuest;
+import dev.crius.cquest.api.event.impl.customevents.impl.CraftItemEvent;
 import dev.crius.cquest.database.QuestData;
 import dev.crius.cquest.quest.Quest;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Objects;
@@ -20,10 +20,10 @@ public class CraftItemQuestRequirement extends ActionQuestRequirement<CraftItemE
 
     @Override
     public boolean isUpdatable(CraftItemEvent event) {
-        ItemStack result = event.getRecipe().getResult();
-        System.out.println("debug1");
-        if(!Objects.requireNonNull(result).isSimilar(itemStack)) return false;
-        System.out.println("debug2");
-        return Objects.requireNonNull(event.getCurrentItem()).isSimilar(itemStack);
+        int requirementIndex = quest.getQuestRequirements().indexOf(this);
+        QuestData questData = CQuest.getInstance().getQuestManager().getQuestData(event.getPlayer(),
+                quest.getId(), requirementIndex);
+        questData.setProgress(questData.getProgress() + event.getResult().getAmount() - 1);
+        return Objects.requireNonNull(event.getResult()).isSimilar(itemStack);
     }
 }

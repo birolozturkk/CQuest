@@ -47,7 +47,7 @@ public class BossBarManager {
     public void show(Player player) {
         Optional<BossBar> bossBar = getBossBar(player);
         if(bossBar.isEmpty()) return;
-        bossBars.put(player.getUniqueId(), bossBar.get());
+        update(player);
         Audience receiver = plugin.adventure().player(player);
         receiver.showBossBar(bossBar.get());
     }

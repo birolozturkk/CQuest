@@ -12,7 +12,7 @@
     <name>CQuest</name>
 
     <properties>
-        <java.version>17</java.version>
+        <java.version>16</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
@@ -58,7 +58,7 @@
                 <artifactId>maven-jar-plugin</artifactId>
                 <version>3.3.0</version>
                 <configuration>
-                    <outputDirectory>C:\Users\PC\Desktop\TestServer\plugins</outputDirectory>
+                    <outputDirectory>C:\Users\kisme\Desktop\spigot\plugins</outputDirectory>
                 </configuration>
             </plugin>
         </plugins>

@@ -1,16 +1,15 @@
 package dev.crius.cquest.listener;
 
 import dev.crius.cquest.CQuest;
-import dev.crius.cquest.api.event.impl.customevents.impl.HarvestEvent;
-import dev.crius.cquest.api.event.impl.customevents.impl.MobKillEvent;
-import dev.crius.cquest.api.event.impl.customevents.impl.PlantEvent;
-import dev.crius.cquest.api.event.impl.customevents.impl.PlayerKillEvent;
+import dev.crius.cquest.api.event.impl.customevents.impl.*;
 import dev.crius.cquest.quest.Quest;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.RegisteredListener;
@@ -31,6 +30,10 @@ public class QuestListener implements Listener {
     }
 
     @EventHandler
+    public void craft(CraftItemEvent event) {
+        this.action(event);
+    }
+    @EventHandler
     public void killPlayer(PlayerKillEvent event) {
         this.action(event);
     }
@@ -46,6 +49,15 @@ public class QuestListener implements Listener {
 
     @EventHandler
     public void harvest(HarvestEvent event) {
+        this.action(event);
+    }
+    @EventHandler
+    public void blockBreak(PlayerBlockBreakEvent event) {
+        this.action(event);
+    }
+
+    @EventHandler
+    public void blockPlace(PlayerBlockPlaceEvent event) {
         this.action(event);
     }
 

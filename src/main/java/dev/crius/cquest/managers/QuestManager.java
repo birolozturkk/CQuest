@@ -73,6 +73,12 @@ public class QuestManager {
                         switch (args[0]) {
                             case "ITEM" -> questRequirement = new ItemQuestRequirement(quest);
                             case "MONEY" -> questRequirement = new MoneyQuestRequirement(quest);
+                            case "PLACE" -> questRequirement = new BlockPlaceQuestRequirement(quest,
+                                    XMaterial.matchXMaterial(args[1]).orElse(XMaterial.AIR), Integer.parseInt(args[2]));
+                            case "PICKUP" -> questRequirement = new PickupItemQuestRequirement(quest,
+                                    XMaterial.matchXMaterial(args[1]).orElse(XMaterial.AIR).parseItem(), Integer.parseInt(args[2]));
+                            case "BREAK" -> questRequirement = new BlockBreakQuestRequirement(quest,
+                                    XMaterial.matchXMaterial(args[1]).orElse(XMaterial.AIR), Integer.parseInt(args[2]));
                             case "CRAFT_ITEM" -> questRequirement = new CraftItemQuestRequirement(quest,
                                     XMaterial.matchXMaterial(args[1]).orElse(XMaterial.AIR).parseItem(), Integer.parseInt(args[2]));
                             case "KILL_PLAYER" -> questRequirement = new PlayerKillQuestRequirement(quest, Integer.parseInt(args[1]));
@@ -107,8 +113,7 @@ public class QuestManager {
         activeQuest.setQuestId(quest.getId());
         activeQuest.setChanged(true);
         activeQuestRepository.save(activeQuest);
-        plugin.getBossBarManager().update(player);
-        Bukkit.getScheduler().runTaskLater(plugin, () -> plugin.getBossBarManager().show(player), 20);
+        Bukkit.getScheduler().runTaskLater(plugin, () -> plugin.getBossBarManager().update(player), 20);
     }
 
     public void completeQuest(Player player, Quest quest) {

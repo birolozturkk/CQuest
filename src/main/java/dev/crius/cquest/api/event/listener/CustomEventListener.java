@@ -2,10 +2,7 @@ package dev.crius.cquest.api.event.listener;
 
 import com.cryptomorin.xseries.XMaterial;
 import dev.crius.cquest.CQuest;
-import dev.crius.cquest.api.event.impl.customevents.impl.HarvestEvent;
-import dev.crius.cquest.api.event.impl.customevents.impl.MobKillEvent;
-import dev.crius.cquest.api.event.impl.customevents.impl.PlantEvent;
-import dev.crius.cquest.api.event.impl.customevents.impl.PlayerKillEvent;
+import dev.crius.cquest.api.event.impl.customevents.impl.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -55,7 +52,7 @@ public class CustomEventListener implements Listener {
         Bukkit.getPluginManager().callEvent(new PlantEvent(player, XMaterial.matchXMaterial(material)));
     }
 
-    @EventHandler(priority = EventPriority.MONITOR)
+    @EventHandler
     public void kill(EntityDamageByEntityEvent event) {
         if (!(event.getDamager() instanceof Player damager)) return;
 
@@ -68,6 +65,24 @@ public class CustomEventListener implements Listener {
         if (victim.getHealth() > event.getFinalDamage()) return;
 
         Bukkit.getPluginManager().callEvent(new MobKillEvent(damager, victim, event.getCause()));
+    }
+
+    @EventHandler
+    public void craft(org.bukkit.event.inventory.CraftItemEvent event) {
+        if(!(event.getWhoClicked() instanceof Player player)) return;
+        Bukkit.getPluginManager().callEvent(new CraftItemEvent(player, event.getCurrentItem()));
+    }
+
+    @EventHandler
+    public void blockBreak(BlockBreakEvent event) {
+        Bukkit.getPluginManager().callEvent(new PlayerBlockBreakEvent(event.getPlayer(),
+                XMaterial.matchXMaterial(event.getBlock().getType())));
+    }
+
+    @EventHandler
+    public void blockPlace(BlockPlaceEvent event) {
+        Bukkit.getPluginManager().callEvent(new PlayerBlockPlaceEvent(event.getPlayer(),
+                XMaterial.matchXMaterial(event.getBlock().getType())));
     }
 
     private boolean isAllowedMob(Mob mob) {
