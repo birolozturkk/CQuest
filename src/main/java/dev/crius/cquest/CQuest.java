@@ -17,6 +17,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
+import org.bukkit.NamespacedKey;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -41,6 +42,8 @@ public final class CQuest extends JavaPlugin {
     private BukkitAudiences adventure;
 
     private EconomyHook economyHook;
+
+    private final NamespacedKey isDropsKey = new NamespacedKey(CQuest.getInstance(), "is-drops");
 
     @Override
     public void onEnable() {

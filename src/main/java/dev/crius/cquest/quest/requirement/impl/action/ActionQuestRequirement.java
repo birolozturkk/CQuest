@@ -24,9 +24,7 @@ public abstract class ActionQuestRequirement<T extends Event> extends QuestRequi
         this.progress = progress;
     }
 
-    public boolean isUpdatable(T event) {
-        return true;
-    }
+    public abstract boolean isUpdatable(T event);
 
     @Override
     public boolean control(Player player) {

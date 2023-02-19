@@ -77,11 +77,11 @@ public class QuestManager {
                             case "PLACE" -> questRequirement = new BlockPlaceRequirement(quest,
                                     XMaterial.matchXMaterial(args[1]).orElse(XMaterial.AIR), Integer.parseInt(args[2]));
                             case "PICKUP" -> questRequirement = new PickupItemQuestRequirement(quest,
-                                    XMaterial.matchXMaterial(args[1]).orElse(XMaterial.AIR).parseItem(), Integer.parseInt(args[2]));
+                                    XMaterial.matchXMaterial(args[1]).orElse(XMaterial.AIR).parseMaterial(), Integer.parseInt(args[2]));
                             case "BREAK" -> questRequirement = new BlockBreakRequirement(quest,
                                     XMaterial.matchXMaterial(args[1]).orElse(XMaterial.AIR), Integer.parseInt(args[2]));
                             case "CRAFT_ITEM" -> questRequirement = new CraftItemQuestRequirement(quest,
-                                    XMaterial.matchXMaterial(args[1]).orElse(XMaterial.AIR).parseItem(), Integer.parseInt(args[2]));
+                                    XMaterial.matchXMaterial(args[1]).orElse(XMaterial.AIR).parseMaterial(), Integer.parseInt(args[2]));
                             case "KILL_PLAYER" ->
                                     questRequirement = new PlayerKilRequirement(quest, Integer.parseInt(args[1]));
                             case "KILL_MOB" -> questRequirement = new MobKilRequirement(quest,

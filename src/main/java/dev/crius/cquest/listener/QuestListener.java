@@ -14,6 +14,7 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.player.PlayerEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.RegisteredListener;
 
 import java.util.Optional;
@@ -33,6 +34,15 @@ public class QuestListener implements Listener {
 
     @EventHandler
     public void pickup(PlayerPickupEvent event) {
+
+        if(event.getItem().getItemStack().getItemMeta().getPersistentDataContainer()
+                .has(CQuest.getInstance().getIsDropsKey(), PersistentDataType.BYTE) {
+
+        }
+        this.action(event);
+    }
+    @EventHandler
+    public void craft(CraftItemEvent event) {
         this.action(event);
     }
     @EventHandler

@@ -5,6 +5,7 @@ import dev.crius.cquest.CQuest;
 import dev.crius.cquest.api.event.impl.customevents.impl.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.Ageable;
 import org.bukkit.entity.Mob;
@@ -14,11 +15,14 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.persistence.PersistentDataType;
 
+import java.util.List;
 import java.util.Objects;
 
 public class CustomEventListener implements Listener {
@@ -65,6 +69,20 @@ public class CustomEventListener implements Listener {
         if (victim.getHealth() > event.getFinalDamage()) return;
 
         Bukkit.getPluginManager().callEvent(new MobKillEvent(damager, victim, event.getCause()));
+    }
+
+    @EventHandler
+    public void kill(EntityDeathEvent event) {
+        if (event.getEntity() instanceof Player) return;
+
+        if (!(event.getEntity() instanceof Mob victim)) return;
+
+        List<ItemStack> drops = event.getDrops();
+        drops.stream()
+                .map(ItemStack::getItemMeta)
+                .forEach(itemMeta -> itemMeta.getPersistentDataContainer().set(CQuest.getInstance().getIsDropsKey(),
+                        PersistentDataType.BYTE, (byte) 0));
+
     }
 
     @EventHandler

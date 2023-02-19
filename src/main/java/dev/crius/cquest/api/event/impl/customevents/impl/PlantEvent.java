@@ -7,7 +7,6 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 @Getter
-
 public class PlantEvent extends AbstractPlayerEvent {
 
     private final XMaterial plant;
