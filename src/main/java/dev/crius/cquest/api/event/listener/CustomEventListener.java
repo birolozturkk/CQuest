@@ -7,16 +7,17 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.Ageable;
-import org.bukkit.entity.Animals;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityPickupItemEvent;
+import org.bukkit.event.inventory.ClickType;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.Objects;
 
@@ -61,7 +62,6 @@ public class CustomEventListener implements Listener {
             return;
         }
         if (!(event.getEntity() instanceof Mob victim)) return;
-        if (!isAllowedMob(victim)) return;
         if (victim.getHealth() > event.getFinalDamage()) return;
 
         Bukkit.getPluginManager().callEvent(new MobKillEvent(damager, victim, event.getCause()));
@@ -69,8 +69,24 @@ public class CustomEventListener implements Listener {
 
     @EventHandler
     public void craft(org.bukkit.event.inventory.CraftItemEvent event) {
-        if(!(event.getWhoClicked() instanceof Player player)) return;
-        Bukkit.getPluginManager().callEvent(new CraftItemEvent(player, event.getCurrentItem()));
+        if (!(event.getWhoClicked() instanceof Player player)) return;
+
+        ItemStack craftedItem = event.getRecipe().getResult();
+        Inventory Inventory = event.getInventory();
+        ClickType clickType = event.getClick();
+        int realAmount = craftedItem.getAmount();
+        if (clickType.isShiftClick()) {
+            int lowerAmount = craftedItem.getMaxStackSize() + 1000; //Set lower at recipe result max stack size + 1000 (or just highter max stacksize of reciped item)
+            for (ItemStack actualItem : Inventory.getContents()) //For each item in crafting inventory
+                {
+                if (!actualItem.getType().isAir() && lowerAmount > actualItem.getAmount() && !actualItem.getType().equals(craftedItem.getType())) //if slot is not air && lowerAmount is highter than this slot amount && it's not the recipe amount
+                    lowerAmount = actualItem.getAmount(); //Set new lower amount
+            }
+            //Calculate the final amount : lowerAmount * craftedItem.getAmount
+            realAmount = lowerAmount * craftedItem.getAmount();
+
+        }
+        Bukkit.getPluginManager().callEvent(new CraftItemEvent(player, event.getCurrentItem(), realAmount));
     }
 
     @EventHandler
@@ -85,12 +101,11 @@ public class CustomEventListener implements Listener {
                 XMaterial.matchXMaterial(event.getBlock().getType())));
     }
 
-    private boolean isAllowedMob(Mob mob) {
-        return CQuest.getInstance().getConfiguration()
-                .allowedMobs
-                .stream()
-                .toList()
-                .contains(mob.getType());
+
+    @EventHandler
+    public void pickup(EntityPickupItemEvent event) {
+        if (!(event.getEntity() instanceof Player player)) return;
+        Bukkit.getPluginManager().callEvent(new PlayerPickupEvent(player, event.getItem()));
     }
 
     private boolean isAllowedPlant(Material material) {

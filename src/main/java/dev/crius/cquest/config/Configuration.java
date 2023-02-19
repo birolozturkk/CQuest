@@ -13,7 +13,6 @@ public class Configuration {
     public BossBar bossBar = new BossBar();
 
     public List<XMaterial> allowedPlants = Arrays.asList(XMaterial.OAK_SAPLING, XMaterial.POTATOES, XMaterial.WHEAT);
-    public List<EntityType> allowedMobs = Arrays.asList(EntityType.ZOMBIE, EntityType.SKELETON, EntityType.SHEEP);
     public Messages messages = new Messages();
 
     public static class Messages {

@@ -24,7 +24,7 @@ public class PlaceholderBuilder {
         placeholders.add(new Placeholder("%quest_name%", String.valueOf(quest.getName())));
 
         int progress = quest.getProgress(player);
-        int requirementProgress = quest.getRequirementProgress(player);
+        int requirementProgress = quest.getRequirementProgress();
         placeholders.add(new Placeholder("%progress%", String.valueOf(progress)));
         placeholders.add(new Placeholder("%requirement_progress%", String.valueOf(requirementProgress)));
         placeholders.add(new Placeholder("%left_progress%", String.valueOf(requirementProgress - progress)));

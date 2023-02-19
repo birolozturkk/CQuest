@@ -4,11 +4,11 @@ import com.cryptomorin.xseries.XMaterial;
 import dev.crius.cquest.api.event.impl.customevents.impl.HarvestEvent;
 import dev.crius.cquest.quest.Quest;
 
-public class HarvestQuestRequirement extends ActionQuestRequirement<HarvestEvent> {
+public class HarvestRequirement extends ActionQuestRequirement<HarvestEvent> {
 
     private final XMaterial crop;
 
-    public HarvestQuestRequirement(Quest quest, XMaterial crop, int progress) {
+    public HarvestRequirement(Quest quest, XMaterial crop, int progress) {
         super(quest, HarvestEvent.class, progress);
         this.crop = crop;
     }

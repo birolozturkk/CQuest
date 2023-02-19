@@ -2,6 +2,7 @@ package dev.crius.cquest.quest.requirement.impl.action;
 
 import dev.crius.cquest.CQuest;
 import dev.crius.cquest.api.event.impl.customevents.impl.PlayerKillEvent;
+import dev.crius.cquest.database.QuestData;
 import dev.crius.cquest.quest.Quest;
 import dev.crius.cquest.quest.requirement.QuestRequirement;
 import lombok.Data;
@@ -31,5 +32,12 @@ public abstract class ActionQuestRequirement<T extends Event> extends QuestRequi
     public boolean control(Player player) {
         return CQuest.getInstance().getQuestManager().getQuestData(player, quest.getId(),
                 quest.getQuestRequirements().indexOf(this)).getProgress() >= progress;
+    }
+
+    protected QuestData getQuestData(Player player) {
+        int requirementIndex = quest.getQuestRequirements().indexOf(this);
+        return CQuest.getInstance().getQuestManager().getQuestData(player,
+                quest.getId(), requirementIndex);
+
     }
 }

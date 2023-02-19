@@ -11,14 +11,15 @@ import dev.crius.cquest.quest.requirement.QuestRequirement;
 import dev.crius.cquest.quest.requirement.impl.action.*;
 import dev.crius.cquest.quest.requirement.impl.state.ItemQuestRequirement;
 import dev.crius.cquest.quest.requirement.impl.state.MoneyQuestRequirement;
+import dev.crius.cquest.quest.reward.QuestReward;
+import dev.crius.cquest.quest.reward.impl.DefaultQuestReward;
+import dev.crius.cquest.quest.reward.impl.ItemReward;
+import dev.crius.cquest.quest.reward.impl.MoneyReward;
 import dev.crius.cquest.repository.impl.ActiveQuestRepository;
 import dev.crius.cquest.repository.impl.CompletedQuestRepository;
 import dev.crius.cquest.repository.impl.QuestDataRepository;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageEvent;
 
 import java.io.File;
 import java.util.*;
@@ -73,20 +74,21 @@ public class QuestManager {
                         switch (args[0]) {
                             case "ITEM" -> questRequirement = new ItemQuestRequirement(quest);
                             case "MONEY" -> questRequirement = new MoneyQuestRequirement(quest);
-                            case "PLACE" -> questRequirement = new BlockPlaceQuestRequirement(quest,
+                            case "PLACE" -> questRequirement = new BlockPlaceRequirement(quest,
                                     XMaterial.matchXMaterial(args[1]).orElse(XMaterial.AIR), Integer.parseInt(args[2]));
                             case "PICKUP" -> questRequirement = new PickupItemQuestRequirement(quest,
                                     XMaterial.matchXMaterial(args[1]).orElse(XMaterial.AIR).parseItem(), Integer.parseInt(args[2]));
-                            case "BREAK" -> questRequirement = new BlockBreakQuestRequirement(quest,
+                            case "BREAK" -> questRequirement = new BlockBreakRequirement(quest,
                                     XMaterial.matchXMaterial(args[1]).orElse(XMaterial.AIR), Integer.parseInt(args[2]));
                             case "CRAFT_ITEM" -> questRequirement = new CraftItemQuestRequirement(quest,
                                     XMaterial.matchXMaterial(args[1]).orElse(XMaterial.AIR).parseItem(), Integer.parseInt(args[2]));
-                            case "KILL_PLAYER" -> questRequirement = new PlayerKillQuestRequirement(quest, Integer.parseInt(args[1]));
-                            case "KILL_MOB" -> questRequirement = new MobKillQuestRequirement(quest,
+                            case "KILL_PLAYER" ->
+                                    questRequirement = new PlayerKilRequirement(quest, Integer.parseInt(args[1]));
+                            case "KILL_MOB" -> questRequirement = new MobKilRequirement(quest,
                                     EntityType.valueOf(args[1]), Integer.parseInt(args[2]));
-                            case "HARVEST" -> questRequirement = new HarvestQuestRequirement(quest,
+                            case "HARVEST" -> questRequirement = new HarvestRequirement(quest,
                                     XMaterial.matchXMaterial(args[1]).orElse(XMaterial.AIR), Integer.parseInt(args[2]));
-                            case "PLANT" -> questRequirement = new PlantQuestRequirement(quest,
+                            case "PLANT" -> questRequirement = new PlantRequirement(quest,
                                     XMaterial.matchXMaterial(args[1]).orElse(XMaterial.AIR), Integer.parseInt(args[2]));
                             default -> {
                                 questRequirement = new DefaultQuestRequirement(quest);
@@ -95,13 +97,29 @@ public class QuestManager {
                         }
                         quest.getQuestRequirements().add(questRequirement);
                     });
+
+            quest.getRewards().stream()
+                    .map(reward -> reward.split(" "))
+                    .forEach(args -> {
+                        QuestReward questReward;
+                        switch (args[0]) {
+                            case "ITEM" -> questReward = new ItemReward(XMaterial.matchXMaterial(args[1])
+                                    .orElse(XMaterial.AIR)
+                                    .parseItem(), Integer.parseInt(args[2]));
+                            case "MONEY" -> questReward = new MoneyReward(Double.parseDouble(args[1]));
+                            default -> {
+                                questReward = new DefaultQuestReward();
+                                plugin.log("reward was not found", Level.SEVERE);
+                            }
+                        }
+                        quest.getQuestRewards().add(questReward);
+                    });
         });
 
     }
 
     public void assignQuest(Player player, Quest quest) {
         Optional<ActiveQuest> activeQuestOptional = getActiveQuest(player);
-        if (getQuest(quest.getId()).isEmpty()) plugin.getBossBarManager().hide(player);
         if (activeQuestOptional.isEmpty()) {
             ActiveQuest activeQuest = new ActiveQuest(player.getUniqueId(), quest.getId());
             activeQuestRepository.addEntry(activeQuest);
@@ -113,7 +131,7 @@ public class QuestManager {
         activeQuest.setQuestId(quest.getId());
         activeQuest.setChanged(true);
         activeQuestRepository.save(activeQuest);
-        Bukkit.getScheduler().runTaskLater(plugin, () -> plugin.getBossBarManager().update(player), 20);
+        plugin.getBossBarManager().update(player);
     }
 
     public void completeQuest(Player player, Quest quest) {

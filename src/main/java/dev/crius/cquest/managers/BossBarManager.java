@@ -27,6 +27,10 @@ public class BossBarManager {
         Optional<BossBar> bossBar = getBossBar(player);
         Optional<Quest> quest = plugin.getQuestManager().getQuest(player);
         if(bossBar.isEmpty()) return;
+        if(quest.isEmpty()) {
+            hide(player);
+            return;
+        }
         bossBar.get().color(plugin.getConfiguration().bossBar.color);
         bossBar.get().overlay(plugin.getConfiguration().bossBar.segment);
         bossBar.get().progress(getProgress(player, quest.get()));
@@ -35,7 +39,6 @@ public class BossBarManager {
 
 
     public void create(Player player) {
-        hide(player);
         Optional<Quest> quest = plugin.getQuestManager().getQuest(player);
         if(quest.isEmpty()) return;
 
@@ -61,7 +64,9 @@ public class BossBarManager {
     }
 
     private float getProgress(Player player, Quest quest) {
-        return (float) quest.getProgress(player) / quest.getRequirementProgress(player);
+        float progress = (float) quest.getProgress(player) / quest.getRequirementProgress();
+        if(progress > 1) return 1f;
+        return progress;
     }
     private String getContent(Player player, Quest quest) {
         return StringUtils.format(plugin.getConfiguration().bossBar.content,

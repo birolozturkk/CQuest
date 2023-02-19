@@ -20,10 +20,8 @@ public class CraftItemQuestRequirement extends ActionQuestRequirement<CraftItemE
 
     @Override
     public boolean isUpdatable(CraftItemEvent event) {
-        int requirementIndex = quest.getQuestRequirements().indexOf(this);
-        QuestData questData = CQuest.getInstance().getQuestManager().getQuestData(event.getPlayer(),
-                quest.getId(), requirementIndex);
-        questData.setProgress(questData.getProgress() + event.getResult().getAmount() - 1);
+        QuestData questData = getQuestData(event.getPlayer());
+        questData.setProgress(questData.getProgress() + event.getResultCount() - 1);
         return Objects.requireNonNull(event.getResult()).isSimilar(itemStack);
     }
 }

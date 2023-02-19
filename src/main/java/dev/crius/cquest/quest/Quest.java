@@ -5,6 +5,7 @@ import dev.crius.cquest.CQuest;
 import dev.crius.cquest.database.QuestData;
 import dev.crius.cquest.quest.requirement.QuestRequirement;
 import dev.crius.cquest.quest.requirement.impl.action.ActionQuestRequirement;
+import dev.crius.cquest.quest.reward.QuestReward;
 import dev.crius.cquest.utils.StringUtils;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -28,9 +29,12 @@ public class Quest {
     private String name;
     private String description;
     private List<String> requirements = new ArrayList<>();
+    private List<String> rewards = new ArrayList<>();
 
     @JsonIgnore
     private final List<QuestRequirement> questRequirements = new ArrayList<>();
+    @JsonIgnore
+    private final List<QuestReward> questRewards = new ArrayList<>();
 
 
     public Quest(int id) {
@@ -43,7 +47,7 @@ public class Quest {
     }
 
     private void finish(Player player) {
-        player.sendMessage("Congrats Quest is finished");
+        questRewards.forEach(questReward -> questReward.applyTo(player));
         CQuest.getInstance().getQuestManager().assignQuest(player, getNext());
         CQuest.getInstance().getQuestManager().completeQuest(player, this);
         Audience receiver = CQuest.getInstance().adventure().player(player);
@@ -89,11 +93,11 @@ public class Quest {
 
 
     private int getRequirementIndex(QuestRequirement questRequirement) {
-        return questRequirement.getQuest().getQuestRequirements().indexOf(questRequirement);
+        return questRequirements.indexOf(questRequirement);
     }
 
     public int getProgress(Player player) {
-        return  questRequirements.stream()
+        return questRequirements.stream()
                 .map(this::getRequirementIndex)
                 .map(requirementIndex ->
                         CQuest.getInstance().getQuestManager().getQuestData(player, id, requirementIndex))
@@ -102,7 +106,7 @@ public class Quest {
     }
 
 
-    public int getRequirementProgress(Player player) {
+    public int getRequirementProgress() {
         return getActionRequirements().stream()
                 .map(ActionQuestRequirement::getProgress)
                 .reduce(0, Integer::sum);
@@ -113,6 +117,10 @@ public class Quest {
         increment(event, player);
         CQuest.getInstance().getBossBarManager().update(player);
         accept(player);
+    }
+
+    private boolean isCompleted(Player player) {
+        return CQuest.getInstance().getQuestManager().getCompletedQuests(player).contains(this);
     }
 
     public void accept(Player player) {

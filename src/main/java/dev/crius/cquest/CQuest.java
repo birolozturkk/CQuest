@@ -6,6 +6,8 @@ import dev.crius.cquest.commands.CQuestCommand;
 import dev.crius.cquest.commands.QuestCommand;
 import dev.crius.cquest.config.Configuration;
 import dev.crius.cquest.config.SQL;
+import dev.crius.cquest.hook.money.EconomyHook;
+import dev.crius.cquest.hook.money.impl.Vault.VaultEconomyHook;
 import dev.crius.cquest.listener.QuestListener;
 import dev.crius.cquest.managers.BossBarManager;
 import dev.crius.cquest.managers.DatabaseManager;
@@ -16,6 +18,7 @@ import lombok.NonNull;
 import lombok.SneakyThrows;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bukkit.command.CommandSender;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.IOException;
@@ -37,6 +40,8 @@ public final class CQuest extends JavaPlugin {
 
     private BukkitAudiences adventure;
 
+    private EconomyHook economyHook;
+
     @Override
     public void onEnable() {
         instance = this;
@@ -53,6 +58,7 @@ public final class CQuest extends JavaPlugin {
         loadConfigs();
         saveConfigs();
         setupManagers();
+        setupEconomy();
         questManager.load();
         registerListeners();
         commandManager.registerCommand(new QuestCommand(this));
@@ -82,6 +88,13 @@ public final class CQuest extends JavaPlugin {
         questListener.register();
         getServer().getPluginManager().registerEvents(questListener, this);
         getServer().getPluginManager().registerEvents(new CustomEventListener(), this);
+    }
+
+    private void setupEconomy() {
+        PluginManager pluginManager = this.getServer().getPluginManager();
+
+        if (pluginManager.getPlugin("Vault") != null)
+            economyHook = new VaultEconomyHook();
     }
 
     @Override
