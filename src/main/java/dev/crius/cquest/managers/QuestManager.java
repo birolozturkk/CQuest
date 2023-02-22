@@ -12,6 +12,7 @@ import dev.crius.cquest.quest.requirement.impl.action.*;
 import dev.crius.cquest.quest.requirement.impl.state.ItemQuestRequirement;
 import dev.crius.cquest.quest.requirement.impl.state.MoneyQuestRequirement;
 import dev.crius.cquest.quest.reward.QuestReward;
+import dev.crius.cquest.quest.reward.impl.CommandReward;
 import dev.crius.cquest.quest.reward.impl.DefaultQuestReward;
 import dev.crius.cquest.quest.reward.impl.ItemReward;
 import dev.crius.cquest.quest.reward.impl.MoneyReward;
@@ -76,14 +77,19 @@ public class QuestManager {
                             case "MONEY" -> questRequirement = new MoneyQuestRequirement(quest);
                             case "PLACE" -> questRequirement = new BlockPlaceRequirement(quest,
                                     XMaterial.matchXMaterial(args[1]).orElse(XMaterial.AIR), Integer.parseInt(args[2]));
-                            case "PICKUP" -> questRequirement = new PickupItemQuestRequirement(quest,
+                            case "OBTAIN" -> questRequirement = new ObtainRequirement(quest,
+                                    XMaterial.matchXMaterial(args[1]).orElse(XMaterial.AIR).parseMaterial(), Integer.parseInt(args[2]));
+                            case "PICKUP" -> questRequirement = new PickupItemRequirement(quest,
                                     XMaterial.matchXMaterial(args[1]).orElse(XMaterial.AIR).parseMaterial(), Integer.parseInt(args[2]));
                             case "BREAK" -> questRequirement = new BlockBreakRequirement(quest,
                                     XMaterial.matchXMaterial(args[1]).orElse(XMaterial.AIR), Integer.parseInt(args[2]));
-                            case "CRAFT_ITEM" -> questRequirement = new CraftItemQuestRequirement(quest,
+                            case "CRAFT_ITEM" -> questRequirement = new CraftItemRequirement(quest,
                                     XMaterial.matchXMaterial(args[1]).orElse(XMaterial.AIR).parseMaterial(), Integer.parseInt(args[2]));
                             case "KILL_PLAYER" ->
                                     questRequirement = new PlayerKilRequirement(quest, Integer.parseInt(args[1]));
+                            case "FISHING" ->
+                                    questRequirement = new FishingRequirement(quest, XMaterial.matchXMaterial(args[1])
+                                            .orElse(XMaterial.AIR).parseMaterial(), Integer.parseInt(args[2]));
                             case "KILL_MOB" -> questRequirement = new MobKilRequirement(quest,
                                     EntityType.valueOf(args[1]), Integer.parseInt(args[2]));
                             case "HARVEST" -> questRequirement = new HarvestRequirement(quest,
@@ -107,6 +113,13 @@ public class QuestManager {
                                     .orElse(XMaterial.AIR)
                                     .parseItem(), Integer.parseInt(args[2]));
                             case "MONEY" -> questReward = new MoneyReward(Double.parseDouble(args[1]));
+                            case "COMMAND" -> {
+                                StringBuilder builder = new StringBuilder();
+                                for (int i = 1; i < args.length; i++) {
+                                    builder.append(args[i]).append(" ");
+                                }
+                                questReward = new CommandReward(builder.toString());
+                            }
                             default -> {
                                 questReward = new DefaultQuestReward();
                                 plugin.log("reward was not found", Level.SEVERE);

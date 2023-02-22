@@ -8,4 +8,9 @@ public class PlayerKilRequirement extends ActionQuestRequirement<PlayerKillEvent
     public PlayerKilRequirement(Quest quest, int progress) {
         super(quest, PlayerKillEvent.class, progress);
     }
+
+    @Override
+    public boolean isUpdatable(PlayerKillEvent event) {
+        return false;
+    }
 }

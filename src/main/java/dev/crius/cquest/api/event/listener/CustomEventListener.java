@@ -20,6 +20,7 @@ import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 
 import java.util.List;
@@ -75,13 +76,15 @@ public class CustomEventListener implements Listener {
     public void kill(EntityDeathEvent event) {
         if (event.getEntity() instanceof Player) return;
 
-        if (!(event.getEntity() instanceof Mob victim)) return;
+        if (!(event.getEntity() instanceof Mob)) return;
 
         List<ItemStack> drops = event.getDrops();
-        drops.stream()
-                .map(ItemStack::getItemMeta)
-                .forEach(itemMeta -> itemMeta.getPersistentDataContainer().set(CQuest.getInstance().getIsDropsKey(),
-                        PersistentDataType.BYTE, (byte) 0));
+        drops.forEach(itemStack -> {
+            ItemMeta itemMeta = itemStack.getItemMeta();
+            itemMeta.getPersistentDataContainer().set(CQuest.getInstance().getIsDropsKey(),
+                    PersistentDataType.BYTE, (byte) 0);
+            itemStack.setItemMeta(itemMeta);
+        });
 
     }
 
@@ -96,7 +99,7 @@ public class CustomEventListener implements Listener {
         if (clickType.isShiftClick()) {
             int lowerAmount = craftedItem.getMaxStackSize() + 1000; //Set lower at recipe result max stack size + 1000 (or just highter max stacksize of reciped item)
             for (ItemStack actualItem : Inventory.getContents()) //For each item in crafting inventory
-                {
+            {
                 if (!actualItem.getType().isAir() && lowerAmount > actualItem.getAmount() && !actualItem.getType().equals(craftedItem.getType())) //if slot is not air && lowerAmount is highter than this slot amount && it's not the recipe amount
                     lowerAmount = actualItem.getAmount(); //Set new lower amount
             }

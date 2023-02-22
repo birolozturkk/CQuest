@@ -43,11 +43,12 @@ public final class CQuest extends JavaPlugin {
 
     private EconomyHook economyHook;
 
-    private final NamespacedKey isDropsKey = new NamespacedKey(CQuest.getInstance(), "is-drops");
+    private NamespacedKey isDropsKey;
 
     @Override
     public void onEnable() {
         instance = this;
+        isDropsKey = new NamespacedKey(CQuest.getInstance(), "is-drops");
         if (!getDataFolder().exists()) this.getDataFolder().mkdirs();
 
         try {

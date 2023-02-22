@@ -58,7 +58,7 @@
                 <artifactId>maven-jar-plugin</artifactId>
                 <version>3.3.0</version>
                 <configuration>
-                    <outputDirectory>C:\Users\kisme\Desktop\spigot\plugins</outputDirectory>
+                    <outputDirectory>C:\Users\PC\Desktop\TestServer\plugins</outputDirectory>
                 </configuration>
             </plugin>
         </plugins>

@@ -1,22 +1,15 @@
 package dev.crius.cquest.quest.requirement.impl.action;
 
-import com.cryptomorin.xseries.XMaterial;
-import dev.crius.cquest.CQuest;
 import dev.crius.cquest.api.event.impl.customevents.impl.CraftItemEvent;
 import dev.crius.cquest.database.QuestData;
 import dev.crius.cquest.quest.Quest;
 import org.bukkit.Material;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
-import java.util.Map;
-import java.util.Objects;
-
-public class CraftItemQuestRequirement extends ActionQuestRequirement<CraftItemEvent> {
+public class CraftItemRequirement extends ActionQuestRequirement<CraftItemEvent> {
 
     private final Material type;
 
-    public CraftItemQuestRequirement(Quest quest, Material type, int progress) {
+    public CraftItemRequirement(Quest quest, Material type, int progress) {
         super(quest, CraftItemEvent.class, progress);
         this.type = type;
     }
