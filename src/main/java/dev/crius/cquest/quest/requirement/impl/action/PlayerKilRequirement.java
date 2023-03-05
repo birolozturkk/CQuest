@@ -1,6 +1,6 @@
 package dev.crius.cquest.quest.requirement.impl.action;
 
-import dev.crius.cquest.api.event.impl.customevents.impl.PlayerKillEvent;
+import dev.crius.cquest.api.event.customevents.impl.PlayerKillEvent;
 import dev.crius.cquest.quest.Quest;
 
 public class PlayerKilRequirement extends ActionQuestRequirement<PlayerKillEvent> {
@@ -11,6 +11,6 @@ public class PlayerKilRequirement extends ActionQuestRequirement<PlayerKillEvent
 
     @Override
     public boolean isUpdatable(PlayerKillEvent event) {
-        return false;
+        return true;
     }
 }

@@ -19,6 +19,7 @@ import dev.crius.cquest.quest.reward.impl.MoneyReward;
 import dev.crius.cquest.repository.impl.ActiveQuestRepository;
 import dev.crius.cquest.repository.impl.CompletedQuestRepository;
 import dev.crius.cquest.repository.impl.QuestDataRepository;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
@@ -73,6 +74,15 @@ public class QuestManager {
                     .forEach(args -> {
                         QuestRequirement questRequirement;
                         switch (args[0]) {
+                            case "BREED" -> questRequirement = new BreedRequirement(quest,
+                                   EntityType.valueOf(args[1]), Integer.parseInt(args[2]));
+                            case "SHEAR" -> questRequirement = new ShearRequirement(quest,
+                                    Integer.parseInt(args[1]));
+                            case "RUN" -> questRequirement = new RunRequirement(quest,
+                                    Integer.parseInt(args[1]));
+                            case "COOKING" -> questRequirement = new FurnaceExtractRequirement(quest,
+                                    XMaterial.matchXMaterial(args[1]).orElse(XMaterial.AIR),
+                                    Integer.parseInt(args[2]));
                             case "ITEM" -> questRequirement = new ItemQuestRequirement(quest);
                             case "MONEY" -> questRequirement = new MoneyQuestRequirement(quest);
                             case "PLACE" -> questRequirement = new BlockPlaceRequirement(quest,
@@ -136,21 +146,17 @@ public class QuestManager {
         if (activeQuestOptional.isEmpty()) {
             ActiveQuest activeQuest = new ActiveQuest(player.getUniqueId(), quest.getId());
             activeQuestRepository.addEntry(activeQuest);
-            activeQuestRepository.save(activeQuest);
-            plugin.getBossBarManager().update(player);
+            Bukkit.getScheduler().runTaskLater(plugin, () -> plugin.getBossBarManager().update(player), 20);
             return;
         }
         ActiveQuest activeQuest = activeQuestOptional.get();
         activeQuest.setQuestId(quest.getId());
         activeQuest.setChanged(true);
-        activeQuestRepository.save(activeQuest);
-        plugin.getBossBarManager().update(player);
     }
 
     public void completeQuest(Player player, Quest quest) {
         CompletedQuest completedQuest = new CompletedQuest(player.getUniqueId(), quest.getId());
         completedQuestRepository.addEntry(completedQuest);
-        completedQuestRepository.save(completedQuest);
     }
 
     public Optional<Quest> getQuest(Player player) {
@@ -178,7 +184,7 @@ public class QuestManager {
 
     public List<Quest> getCompletedQuests(Player player) {
         return completedQuestRepository.getCompletedQuests(player.getUniqueId()).stream()
-                .map(completedQuest -> getQuest(completedQuest.getId()))
+                .map(completedQuest -> getQuest(completedQuest.getQuestId()))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .toList();

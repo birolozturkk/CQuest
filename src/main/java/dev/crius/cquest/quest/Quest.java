@@ -3,6 +3,7 @@ package dev.crius.cquest.quest;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import dev.crius.cquest.CQuest;
 import dev.crius.cquest.database.QuestData;
+import dev.crius.cquest.placeholder.PlaceholderBuilder;
 import dev.crius.cquest.quest.requirement.QuestRequirement;
 import dev.crius.cquest.quest.requirement.impl.action.ActionQuestRequirement;
 import dev.crius.cquest.quest.reward.QuestReward;
@@ -14,6 +15,7 @@ import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.title.Title;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 
@@ -28,6 +30,7 @@ public class Quest {
     private int id;
     private String name;
     private String description;
+    private List<String> guiItemLore = new ArrayList<>();
     private List<String> requirements = new ArrayList<>();
     private List<String> rewards = new ArrayList<>();
 
@@ -41,19 +44,24 @@ public class Quest {
         this.id = id;
     }
 
-    public Quest(String name, String description) {
-        this.name = name;
-        this.description = description;
-    }
-
-    private void finish(Player player) {
+    public void finish(Player player) {
         questRewards.forEach(questReward -> questReward.applyTo(player));
         CQuest.getInstance().getQuestManager().assignQuest(player, getNext());
+        CQuest.getInstance().getBossBarManager().update(player);
         CQuest.getInstance().getQuestManager().completeQuest(player, this);
+        player.sendMessage(StringUtils.format(CQuest.getInstance().getConfiguration().messages.completedChatMessage,
+                new PlaceholderBuilder().build()));
+
         Audience receiver = CQuest.getInstance().adventure().player(player);
         String title = StringUtils.colorize(CQuest.getInstance().getConfiguration().messages.completedTitle);
         String subtitle = StringUtils.colorize(CQuest.getInstance().getConfiguration().messages.completedSubtitle);
         receiver.showTitle(Title.title(Component.text(title), Component.text(subtitle)));
+
+        if(CQuest.getInstance().getConfiguration().wonSound.enabled) {
+            Sound sound = Sound.sound(Key.key(CQuest.getInstance().getConfiguration().wonSound.sound),
+                    Sound.Source.PLAYER, CQuest.getInstance().getConfiguration().wonSound.volume, 1f);
+            receiver.playSound(sound);
+        }
     }
 
     private boolean control(Player player) {
@@ -70,7 +78,7 @@ public class Quest {
                             id, requirementIndex);
                     questData.setProgress(questData.getProgress() + 1);
                     questData.setChanged(true);
-                    CQuest.getInstance().getDatabaseManager().getQuestDataRepository().save(questData);
+                    CQuest.getInstance().getBossBarManager().update(player);
                 });
     }
 
@@ -115,7 +123,6 @@ public class Quest {
     public void accept(Event event, Player player) {
         if(getActionRequirements(event).isEmpty()) return;
         increment(event, player);
-        CQuest.getInstance().getBossBarManager().update(player);
         accept(player);
     }
 

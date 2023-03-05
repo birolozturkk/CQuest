@@ -17,6 +17,5 @@ public class CommandReward implements QuestReward {
     public void applyTo(Player player) {
         String command = StringUtils.format(this.command, new PlaceholderBuilder().apply("%player%", player.getName()).build());
         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
-        System.out.println(command);
     }
 }

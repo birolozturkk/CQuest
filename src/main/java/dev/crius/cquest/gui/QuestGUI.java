@@ -49,27 +49,27 @@ public class QuestGUI extends PaginatedGUI<Quest> {
 
     @Override
     public Item getItem(Quest quest) {
-        Item item;
+        ItemBuilder itemBuilder;
         List<Placeholder> placeholders = new PlaceholderBuilder().applyForQuest(quest, player).build();
 
         Optional<Quest> activeQuestOptional = CQuest.getInstance().getQuestManager().getQuest(player);
         List<Quest> completedQuests = CQuest.getInstance().getQuestManager().getCompletedQuests(player);
-        if (activeQuestOptional.isPresent() && activeQuestOptional.get() == quest) {
-            item = ItemUtils.makeItem(questPage.getGui().questItem.canCompleteQuest, placeholders);
-        } else if (completedQuests.contains(quest)) {
-            item = ItemUtils.makeItem(questPage.getGui().questItem.completedQuest, placeholders);
+        if (activeQuestOptional.isPresent() && activeQuestOptional.get().equals(quest)) {
+            itemBuilder = ItemUtils.makeItem(questPage.getGui().questItem.canCompleteQuest, placeholders);
+            itemBuilder.setLore(StringUtils.format(quest.getGuiItemLore(), placeholders));
+        } else if (!completedQuests.contains(quest)) {
+            itemBuilder = ItemUtils.makeItem(questPage.getGui().questItem.canNotCompleteQuest, placeholders);
         } else {
-            item = ItemUtils.makeItem(questPage.getGui().questItem.canNotCompleteQuest, placeholders);
+            itemBuilder = ItemUtils.makeItem(questPage.getGui().questItem.completedQuest, placeholders);
         }
-
-        return item;
+        return itemBuilder.build();
     }
 
     @Override
     public void addContent() {
         super.addContent();
         questPage.getGui().items.values()
-                .forEach(itemConfig -> setItem(ItemUtils.makeItem(itemConfig, new PlaceholderBuilder().build()),
+                .forEach(itemConfig -> setItem(ItemUtils.makeItem(itemConfig, new PlaceholderBuilder().build()).build(),
                         itemConfig.slots));
     }
 

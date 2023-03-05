@@ -17,10 +17,12 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
+import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.io.IOException;
 import java.util.logging.Level;
@@ -44,6 +46,7 @@ public final class CQuest extends JavaPlugin {
     private EconomyHook economyHook;
 
     private NamespacedKey isDropsKey;
+    private BukkitTask saveTask;
 
     @Override
     public void onEnable() {
@@ -57,6 +60,7 @@ public final class CQuest extends JavaPlugin {
             throw new RuntimeException(e);
         }
 
+        saveTask = Bukkit.getScheduler().runTaskTimerAsynchronously(this, this::saveData, 0, 20 * 60 * 5);
         this.adventure = BukkitAudiences.create(this);
 
         loadConfigs();
@@ -67,6 +71,12 @@ public final class CQuest extends JavaPlugin {
         registerListeners();
         commandManager.registerCommand(new QuestCommand(this));
         commandManager.registerCommand(new CQuestCommand(this));
+    }
+
+    public void saveData() {
+        databaseManager.getQuestDataRepository().save();
+        databaseManager.getCompletedQuestRepository().save();
+        databaseManager.getActiveQuestRepository().save();
     }
 
     public void loadConfigs() {
@@ -107,6 +117,8 @@ public final class CQuest extends JavaPlugin {
             this.adventure.close();
             this.adventure = null;
         }
+        if(saveTask != null) saveTask.cancel();
+        saveData();
 
     }
 

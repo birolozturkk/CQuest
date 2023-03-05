@@ -1,4 +1,4 @@
-package dev.crius.cquest.api.event.impl.customevents;
+package dev.crius.cquest.api.event.customevents;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;

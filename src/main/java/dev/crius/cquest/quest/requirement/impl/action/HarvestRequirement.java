@@ -1,7 +1,7 @@
 package dev.crius.cquest.quest.requirement.impl.action;
 
 import com.cryptomorin.xseries.XMaterial;
-import dev.crius.cquest.api.event.impl.customevents.impl.HarvestEvent;
+import dev.crius.cquest.api.event.customevents.impl.HarvestEvent;
 import dev.crius.cquest.quest.Quest;
 
 public class HarvestRequirement extends ActionQuestRequirement<HarvestEvent> {

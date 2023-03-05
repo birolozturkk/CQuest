@@ -17,12 +17,11 @@ public class QuestGUIConfig extends NoItemGUI {
 
     public static class QuestItem {
 
-
         public List<Integer> slots = Arrays.asList(0, 9, 18, 27, 36, 45, 2, 11, 20, 29, 38, 47, 4, 13, 22, 31, 40, 49, 6, 15, 24, 33, 42, 51);
         public dev.crius.cquest.config.inventory.ItemConfig completedQuest = new dev.crius.cquest.config.inventory.ItemConfig(XMaterial.GOLD_INGOT, 1, "&eGörev Tamamlandı", false,
                 null, null, null, Collections.emptyList());
         public dev.crius.cquest.config.inventory.ItemConfig canCompleteQuest = new dev.crius.cquest.config.inventory.ItemConfig(XMaterial.COAL, 1, "&e%quest_name%", false,
-                null, null, null, Arrays.asList("", "&e&lYapılacaklar", "&f,%quest_description%", ""));
+                null, null, null, Arrays.asList("", ""));
         public dev.crius.cquest.config.inventory.ItemConfig canNotCompleteQuest = new dev.crius.cquest.config.inventory.ItemConfig(XMaterial.GOLD_INGOT, 1, "&e???", false,
                 null, null, null, Collections.emptyList());
     }

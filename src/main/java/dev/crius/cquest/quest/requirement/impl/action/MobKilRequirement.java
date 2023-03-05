@@ -1,6 +1,6 @@
 package dev.crius.cquest.quest.requirement.impl.action;
 
-import dev.crius.cquest.api.event.impl.customevents.impl.MobKillEvent;
+import dev.crius.cquest.api.event.customevents.impl.MobKillEvent;
 import dev.crius.cquest.quest.Quest;
 import org.bukkit.entity.EntityType;
 

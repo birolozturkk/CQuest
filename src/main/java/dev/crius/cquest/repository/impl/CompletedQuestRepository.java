@@ -29,7 +29,6 @@ public class CompletedQuestRepository extends Repository<CompletedQuest, Integer
         int index = Collections.binarySearch(completedQuests, new CompletedQuest(playerUUID),
                 Comparator.comparing(CompletedQuest::getPlayerUUID));
         if (index < 0) return Collections.emptyList();
-
         int currentIndex = index - 1;
         List<CompletedQuest> result = new ArrayList<>();
         result.add(completedQuests.get(index));

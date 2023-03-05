@@ -10,9 +10,9 @@ import java.util.List;
 
 public class ItemUtils {
 
-    public static Item makeItem(ItemConfig itemConfig, List<Placeholder> placeholders) {
+    public static ItemBuilder makeItem(ItemConfig itemConfig, List<Placeholder> placeholders) {
 
-        if(itemConfig == null) return new Item(XMaterial.AIR);
+        if(itemConfig == null) return new ItemBuilder(XMaterial.AIR);
         String displayName = StringUtils.format(itemConfig.displayName, placeholders);
         List<String> lore = StringUtils.format(itemConfig.lore, placeholders);
 
@@ -28,8 +28,7 @@ public class ItemUtils {
         }else if (itemConfig.headOwner != null) {
             itemBuilder.setHeadData(SkinUtils.getHeadData(SkinUtils.getUUID(StringUtils.processPlaceholders(itemConfig.headOwner, placeholders))));
         }
-
-        return itemBuilder.build();
+        return itemBuilder;
     }
 
 

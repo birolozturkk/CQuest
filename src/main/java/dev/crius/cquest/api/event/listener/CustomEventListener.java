@@ -2,26 +2,26 @@ package dev.crius.cquest.api.event.listener;
 
 import com.cryptomorin.xseries.XMaterial;
 import dev.crius.cquest.CQuest;
-import dev.crius.cquest.api.event.impl.customevents.impl.*;
+import dev.crius.cquest.api.event.customevents.impl.*;
+import nbtapi.NBTItem;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.Ageable;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.EntityBreedEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.persistence.PersistentDataType;
 
 import java.util.List;
 import java.util.Objects;
@@ -58,32 +58,25 @@ public class CustomEventListener implements Listener {
         Bukkit.getPluginManager().callEvent(new PlantEvent(player, XMaterial.matchXMaterial(material)));
     }
 
-    @EventHandler
-    public void kill(EntityDamageByEntityEvent event) {
-        if (!(event.getDamager() instanceof Player damager)) return;
-
-        if (event.getEntity() instanceof Player) {
-            Bukkit.getPluginManager().callEvent(new PlayerKillEvent(damager, (Player) event.getEntity(), event.getCause()));
-            return;
-        }
-        if (!(event.getEntity() instanceof Mob victim)) return;
-        if (victim.getHealth() > event.getFinalDamage()) return;
-
-        Bukkit.getPluginManager().callEvent(new MobKillEvent(damager, victim, event.getCause()));
-    }
 
     @EventHandler
     public void kill(EntityDeathEvent event) {
-        if (event.getEntity() instanceof Player) return;
+        Entity victim = event.getEntity();
+        if (victim instanceof Player player) {
+            Bukkit.getPluginManager().callEvent(new PlayerKillEvent(player.getKiller(), player,
+                    event.getEntity().getKiller().getLastDamageCause().getCause()));
+            return;
+        }
 
-        if (!(event.getEntity() instanceof Mob)) return;
+        if (!(event.getEntity() instanceof Mob mob)) return;
 
+        Bukkit.getPluginManager().callEvent(new MobKillEvent(mob.getKiller(), mob,
+                victim.getLastDamageCause().getCause()));
         List<ItemStack> drops = event.getDrops();
         drops.forEach(itemStack -> {
-            ItemMeta itemMeta = itemStack.getItemMeta();
-            itemMeta.getPersistentDataContainer().set(CQuest.getInstance().getIsDropsKey(),
-                    PersistentDataType.BYTE, (byte) 0);
-            itemStack.setItemMeta(itemMeta);
+            NBTItem nbtItem = new NBTItem(itemStack);
+            nbtItem.setBoolean("is-drops", true);
+            nbtItem.applyNBT(itemStack);
         });
 
     }
@@ -114,6 +107,19 @@ public class CustomEventListener implements Listener {
     public void blockBreak(BlockBreakEvent event) {
         Bukkit.getPluginManager().callEvent(new PlayerBlockBreakEvent(event.getPlayer(),
                 XMaterial.matchXMaterial(event.getBlock().getType())));
+    }
+
+    @EventHandler
+    public void furnaceExtract(org.bukkit.event.inventory.FurnaceExtractEvent event) {
+        Bukkit.getPluginManager().callEvent(new FurnaceExtractEvent(event.getPlayer(),
+                XMaterial.matchXMaterial(event.getItemType()), event.getItemAmount()));
+    }
+
+    @EventHandler
+    public void breed(EntityBreedEvent event) {
+        if (!(event.getBreeder() instanceof Player player)) return;
+
+        Bukkit.getPluginManager().callEvent(new PlayerBreedEvent(player, event.getEntityType()));
     }
 
     @EventHandler

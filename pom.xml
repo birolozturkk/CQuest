@@ -41,6 +41,10 @@
                             <createDependencyReducedPom>false</createDependencyReducedPom>
                             <relocations>
                                 <relocation>
+                                    <pattern>de.tr7zw.changeme.nbtapi</pattern>
+                                    <shadedPattern>dev.crius.cquest.libs.nbt</shadedPattern>
+                                </relocation>
+                                <relocation>
                                     <pattern>dev.triumphteam.cmd</pattern>
                                     <shadedPattern>dev.crius.cquest.libs.cmd</shadedPattern>
                                 </relocation>
@@ -58,7 +62,7 @@
                 <artifactId>maven-jar-plugin</artifactId>
                 <version>3.3.0</version>
                 <configuration>
-                    <outputDirectory>C:\Users\PC\Desktop\TestServer\plugins</outputDirectory>
+                    <outputDirectory>C:\Users\kisme\Desktop\spigot\plugins</outputDirectory>
                 </configuration>
             </plugin>
         </plugins>
@@ -86,6 +90,11 @@
         <repository>
             <id>repo</id>
             <url>https://repo.triumphteam.dev/snapshots/</url>
+        </repository>
+        <repository>
+            <id>codemc-repo</id>
+            <url>https://repo.codemc.io/repository/maven-public/</url>
+            <layout>default</layout>
         </repository>
     </repositories>
 
@@ -138,17 +147,28 @@
             <groupId>com.github.birolozturkk</groupId>
             <artifactId>inventoryapi</artifactId>
             <version>v1.1</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>de.tr7zw</groupId>
+                    <artifactId>item-nbt-api-plugin</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.github.cryptomorin</groupId>
             <artifactId>XSeries</artifactId>
             <version>9.2.0</version>
         </dependency>
-
         <dependency>
             <groupId>com.github.MilkBowl</groupId>
             <artifactId>VaultAPI</artifactId>
             <version>1.7</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>de.tr7zw</groupId>
+            <artifactId>item-nbt-api-plugin</artifactId>
+            <version>2.11.1</version>
             <scope>provided</scope>
         </dependency>
 
